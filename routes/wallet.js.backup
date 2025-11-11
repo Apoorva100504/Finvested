@@ -1,0 +1,201 @@
+// routes/wallet.js
+import { db } from '../config/database.js';
+import { randomUUID } from 'crypto';
+
+export default async function walletRoutes(fastify, options) {
+  
+  fastify.addHook('onRequest', async (request, reply) => {
+    try {
+      await request.jwtVerify();
+    } catch (err) {
+      reply.send(err);
+    }
+  });
+
+  // Get wallet balance
+  fastify.get('/wallet', async (request, reply) => {
+    const userId = request.user.id;
+
+    try {
+      const wallet = db.prepare(`
+        SELECT balance, locked_balance, (balance - locked_balance) as available_balance
+        FROM wallets WHERE user_id = ?
+      `).get(userId);
+
+      if (!wallet) {
+        return reply.status(404).send({ error: 'Wallet not found' });
+      }
+      
+      reply.send({
+        wallet: {
+          balance: wallet.balance,
+          lockedBalance: wallet.locked_balance,
+          availableBalance: wallet.available_balance
+        }
+      });
+
+    } catch (error) {
+      fastify.log.error(error);
+      reply.status(500).send({ error: 'Internal server error' });
+    }
+  });
+
+  // Deposit funds (mock)
+  fastify.post('/funds/deposit', {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['amount'],
+        properties: {
+          amount: { type: 'number', minimum: 1, maximum: 1000000 }
+        }
+      }
+    }
+  }, async (request, reply) => {
+    const userId = request.user.id;
+    const { amount } = request.body;
+
+    try {
+      // Start transaction
+      const transaction = db.transaction(() => {
+        // Update wallet balance
+        db.prepare('UPDATE wallets SET balance = balance + ? WHERE user_id = ?')
+          .run(amount, userId);
+
+        // Record transaction
+        db.prepare(`
+          INSERT INTO transactions (id, user_id, type, amount, status, description) 
+          VALUES (?, ?, 'deposit', ?, 'completed', 'Funds deposit via mock payment')
+        `).run(randomUUID(), userId, amount);
+      });
+
+      transaction();
+
+      // Get updated balance
+      const wallet = db.prepare(`
+        SELECT balance, locked_balance FROM wallets WHERE user_id = ?
+      `).get(userId);
+
+      reply.send({
+        message: 'Funds deposited successfully',
+        transaction: {
+          type: 'deposit',
+          amount: amount,
+          status: 'completed',
+          timestamp: new Date().toISOString()
+        },
+        wallet: {
+          balance: wallet.balance,
+          lockedBalance: wallet.locked_balance,
+          availableBalance: wallet.balance - wallet.locked_balance
+        }
+      });
+
+    } catch (error) {
+      fastify.log.error(error);
+      reply.status(500).send({ error: 'Internal server error' });
+    }
+  });
+
+  // Withdraw funds (mock)
+  fastify.post('/funds/withdraw', {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['amount'],
+        properties: {
+          amount: { type: 'number', minimum: 1, maximum: 1000000 }
+        }
+      }
+    }
+  }, async (request, reply) => {
+    const userId = request.user.id;
+    const { amount } = request.body;
+
+    try {
+      // Check available balance
+      const wallet = db.prepare(`
+        SELECT balance, locked_balance FROM wallets WHERE user_id = ?
+      `).get(userId);
+
+      if (!wallet) {
+        return reply.status(404).send({ error: 'Wallet not found' });
+      }
+
+      const availableBalance = wallet.balance - wallet.locked_balance;
+      
+      if (availableBalance < amount) {
+        return reply.status(400).send({ error: 'Insufficient available balance' });
+      }
+
+      // Start transaction
+      const transaction = db.transaction(() => {
+        // Update wallet balance
+        db.prepare('UPDATE wallets SET balance = balance - ? WHERE user_id = ?')
+          .run(amount, userId);
+
+        // Record transaction
+        db.prepare(`
+          INSERT INTO transactions (id, user_id, type, amount, status, description) 
+          VALUES (?, ?, 'withdrawal', ?, 'completed', 'Funds withdrawal via mock payment')
+        `).run(randomUUID(), userId, amount);
+      });
+
+      transaction();
+
+      // Get updated balance
+      const updatedWallet = db.prepare(`
+        SELECT balance, locked_balance FROM wallets WHERE user_id = ?
+      `).get(userId);
+
+      reply.send({
+        message: 'Funds withdrawn successfully',
+        transaction: {
+          type: 'withdrawal',
+          amount: amount,
+          status: 'completed',
+          timestamp: new Date().toISOString()
+        },
+        wallet: {
+          balance: updatedWallet.balance,
+          lockedBalance: updatedWallet.locked_balance,
+          availableBalance: updatedWallet.balance - updatedWallet.locked_balance
+        }
+      });
+
+    } catch (error) {
+      fastify.log.error(error);
+      reply.status(500).send({ error: 'Internal server error' });
+    }
+  });
+
+  // Get transaction history
+  fastify.get('/funds/history', async (request, reply) => {
+    const userId = request.user.id;
+
+    try {
+      const result = db.prepare(`
+        SELECT id, type, amount, status, description, created_at
+        FROM transactions 
+        WHERE user_id = ? 
+        ORDER BY created_at DESC 
+        LIMIT 50
+      `).all(userId);
+
+      const transactions = result.map(row => ({
+        id: row.id,
+        type: row.type,
+        amount: row.amount,
+        status: row.status,
+        description: row.description,
+        timestamp: row.created_at
+      }));
+
+      reply.send({ transactions });
+
+    } catch (error) {
+      fastify.log.error(error);
+      reply.status(500).send({ error: 'Internal server error' });
+    }
+  });
+}

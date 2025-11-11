@@ -1,0 +1,209 @@
+// routes/users.js
+import { db } from '../config/database.js';
+import { randomUUID } from 'crypto';
+
+export default async function userRoutes(fastify, options) {
+  
+  // Add authentication hook for protected routes
+  fastify.addHook('onRequest', async (request, reply) => {
+    try {
+      await request.jwtVerify();
+    } catch (err) {
+      reply.send(err);
+    }
+  });
+
+  // Get user profile
+  fastify.get('/users/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' }
+        }
+      }
+    }
+  }, async (request, reply) => {
+    const userId = request.params.id;
+    const authenticatedUserId = request.user.id;
+
+    // Users can only access their own profile unless they're admin
+    if (userId !== authenticatedUserId && request.user.role !== 'admin') {
+      return reply.status(403).send({ error: 'Access denied' });
+    }
+
+    try {
+      const user = db.prepare(`
+        SELECT u.id, u.email, u.first_name, u.last_name, u.phone, u.role, 
+               u.is_kyc_verified, u.created_at, u.updated_at,
+               k.kyc_status, k.submitted_at, k.verified_at,
+               w.balance, w.locked_balance
+        FROM users u
+        LEFT JOIN kyc_details k ON u.id = k.user_id
+        LEFT JOIN wallets w ON u.id = w.user_id
+        WHERE u.id = ?
+      `).get(userId);
+
+      if (!user) {
+        return reply.status(404).send({ error: 'User not found' });
+      }
+      
+      reply.send({
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          phone: user.phone,
+          role: user.role,
+          isKycVerified: user.is_kyc_verified,
+          kycStatus: user.kyc_status,
+          kycSubmittedAt: user.submitted_at,
+          kycVerifiedAt: user.verified_at,
+          wallet: {
+            balance: user.balance,
+            lockedBalance: user.locked_balance,
+            availableBalance: user.balance - user.locked_balance
+          },
+          createdAt: user.created_at,
+          updatedAt: user.updated_at
+        }
+      });
+
+    } catch (error) {
+      fastify.log.error(error);
+      reply.status(500).send({ error: 'Internal server error' });
+    }
+  });
+
+  // Submit KYC
+  fastify.post('/kyc/submit', {
+    schema: {
+      body: {
+        type: 'object',
+        required: ['panNumber', 'dateOfBirth'],
+        properties: {
+          panNumber: { type: 'string', minLength: 10, maxLength: 10 },
+          aadhaarNumber: { type: 'string', minLength: 12, maxLength: 12 },
+          dateOfBirth: { type: 'string', format: 'date' },
+          address: {
+            type: 'object',
+            properties: {
+              line1: { type: 'string' },
+              line2: { type: 'string' },
+              city: { type: 'string' },
+              state: { type: 'string' },
+              pincode: { type: 'string' },
+              country: { type: 'string' }
+            }
+          }
+        }
+      }
+    }
+  }, async (request, reply) => {
+    const userId = request.user.id;
+    const { panNumber, aadhaarNumber, dateOfBirth, address } = request.body;
+
+    try {
+      // Check if KYC already submitted
+      const existingKyc = db.prepare('SELECT id FROM kyc_details WHERE user_id = ?').get(userId);
+
+      if (existingKyc) {
+        return reply.status(400).send({ error: 'KYC already submitted' });
+      }
+
+      // Submit KYC
+      const insertKyc = db.prepare(`
+        INSERT INTO kyc_details (id, user_id, pan_number, aadhaar_number, date_of_birth, address) 
+        VALUES (?, ?, ?, ?, ?, ?)
+      `);
+      
+      const kycId = randomUUID();
+      insertKyc.run(kycId, userId, panNumber.toUpperCase(), aadhaarNumber, dateOfBirth, JSON.stringify(address));
+
+      const kyc = db.prepare('SELECT id, kyc_status, submitted_at FROM kyc_details WHERE id = ?').get(kycId);
+
+      reply.status(201).send({
+        message: 'KYC submitted successfully',
+        kyc: {
+          id: kyc.id,
+          status: kyc.kyc_status,
+          submittedAt: kyc.submitted_at
+        }
+      });
+
+    } catch (error) {
+      fastify.log.error(error);
+      if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+        return reply.status(400).send({ error: 'PAN or Aadhaar already registered' });
+      }
+      reply.status(500).send({ error: 'Internal server error' });
+    }
+  });
+
+  // Update user profile
+  fastify.put('/users/:id', {
+    schema: {
+      params: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' }
+        }
+      },
+      body: {
+        type: 'object',
+        properties: {
+          firstName: { type: 'string' },
+          lastName: { type: 'string' },
+          phone: { type: 'string' }
+        }
+      }
+    }
+  }, async (request, reply) => {
+    const userId = request.params.id;
+    const authenticatedUserId = request.user.id;
+    const { firstName, lastName, phone } = request.body;
+
+    if (userId !== authenticatedUserId) {
+      return reply.status(403).send({ error: 'Access denied' });
+    }
+
+    try {
+      const updateUser = db.prepare(`
+        UPDATE users 
+        SET first_name = COALESCE(?, first_name), 
+            last_name = COALESCE(?, last_name), 
+            phone = COALESCE(?, phone),
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `);
+      
+      updateUser.run(firstName, lastName, phone, userId);
+
+      const user = db.prepare(`
+        SELECT id, email, first_name, last_name, phone, updated_at 
+        FROM users WHERE id = ?
+      `).get(userId);
+
+      if (!user) {
+        return reply.status(404).send({ error: 'User not found' });
+      }
+      
+      reply.send({
+        message: 'Profile updated successfully',
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          phone: user.phone,
+          updatedAt: user.updated_at
+        }
+      });
+
+    } catch (error) {
+      fastify.log.error(error);
+      reply.status(500).send({ error: 'Internal server error' });
+    }
+  });
+}
