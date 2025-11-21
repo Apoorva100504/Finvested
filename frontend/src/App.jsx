@@ -1,9 +1,19 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react"; // Import useState
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 //import "./App.css";
 import { generateFcmToken, listenForegroundMessages } from "./firebase";
 import Homepage from "./Components/Home/Homepage.jsx";
 import Navbar from "./Components/Home/Navbar";
+// Import the existing Dashboard component from the Account folder
+import Dashboard from "./Components/Account/Dashboard.jsx";
+import AllOrders from "./Components/Account/AllOrders.jsx"; // Assuming these are also in Account
+import CustomerSupport from "./Components/Account/CustomerSupport.jsx"; // Assuming these are also in Account
+import Reports from "./Components/Account/Reports.jsx"; // Assuming these are also in Account
+import Logout from "./Components/Account/Logout.jsx"; // Assuming these are also in Account
+
 function App() {
+  // State for the dashboard modal
+ 
   useEffect(() => {
     const vapidKey =
       "BNuO8ul1x-GKuOpEDPGkBBv911cMJJ30P1wcxx1Tp0WhkZ7jsQ9RyUi26YGAzTuYGDR2HUAILm9wYaVnZ4PUHVQ";
@@ -34,11 +44,30 @@ function App() {
   }, []);
 
   return (
-    <div>
-      <Navbar />
-      {/* Render your Groww UI here */}
-      <Homepage />
-    </div>
+    <Router>
+      <div>
+        <Navbar/>
+        <Routes>
+          {/* Public route for Homepage */}
+          <Route path="/" element={<Homepage />} />
+
+          {/* Dashboard routes */}
+          <Route
+            path="/dashboard"
+            element={<Dashboard
+              
+            />}
+          >
+            <Route path="all-orders" element={<AllOrders />} />
+            <Route path="customer-support" element={<CustomerSupport />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="logout" element={<Logout />} />
+          </Route>
+
+          {/* Add other routes here if needed */}
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
