@@ -10,7 +10,6 @@ import jwt from '@fastify/jwt';
 // Import routes
 import userRoutes from './routes/users.js';
 import authRoutes from './routes/auth.js';
-import kycRoutes from './routes/kyc.js';
 import portfolioRoutes from './routes/portfolio.js';
 import walletRoutes from './routes/wallet.js';
 import stocksRoutes from './routes/stocks.js';
@@ -70,7 +69,6 @@ fastify.register(authRoutes, { prefix: '/api/v1' });
 // Register routes - ORGANIZED WITH PROPER PREFIXES
 // await fastify.register(authRoutes, { prefix: '/api/v1' });
 await fastify.register(userRoutes, { prefix: '/api/v1/users' }); // CHANGED: Added /users prefix
-fastify.register(kycRoutes, { prefix: '/api/v1' });
 await fastify.register(portfolioRoutes, { prefix: '/api/v1' });
 await fastify.register(walletRoutes, { prefix: '/api/v1' });
 await fastify.register(stocksRoutes, { prefix: '/api/v1' });
@@ -94,7 +92,6 @@ fastify.get('/docs', async (request, reply) => {
       // Users - UPDATED PATHS
       'GET /users/user-profile-test': 'Test user route', // NEW
       'GET /users/:id': 'Get user profile',
-      'POST /kyc/submit': 'Submit KYC details',
       'PUT /users/:id': 'Update user profile',
       
       // Portfolio
@@ -232,7 +229,7 @@ fastify.get('/', async (request, reply) => {
     health: '/health',
     total_endpoints: '45+ API endpoints',
     features: [
-      'User Authentication & KYC',
+      'User Authentication',
       'Real-time Stock Prices (WebSocket)',
       'Buy/Sell Order Placement',
       'Portfolio Tracking with P&L',
