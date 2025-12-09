@@ -1,0 +1,16 @@
+// vite.config.js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api/nse': {
+        target: 'https://nseindiaapi.vercel.app',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/nse/, '/api')
+      }
+    }
+  }
+})

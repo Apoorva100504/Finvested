@@ -1,0 +1,456 @@
+/* General modal styling */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  display: flex;
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 900px; /* Adjust as needed */
+  position: relative;
+  height: 70vh; /* Example height, adjust as needed */
+  max-height: 600px; /* Max height to prevent excessive stretching */
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #555;
+}
+
+/* Left panel styling */
+.modal-left-panel {
+  flex: 1;
+  background-color: #00c853; /* Groww green */
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 30px;
+  text-align: center;
+  background-color: #007BFF; 
+  background-size: cover;
+  background-position: center;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.modal-title-left {
+  font-size: 2.5rem; /* 40px */
+  font-weight: 800;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.modal-subtitle-left {
+  font-size: 1.25rem; /* 20px */
+  font-weight: 600;
+}
+
+/* Right panel styling */
+.modal-right-panel {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 400px; /* Limit width of the content area */
+}
+
+.modal-title-right {
+  font-size: 2rem; /* 32px */
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.google-signin-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 20px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.google-signin-button:hover {
+  background-color: #f0f0f0;
+}
+
+.google-signin-button img {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
+
+.or-divider {
+  position: relative;
+  text-align: center;
+  margin: 20px 0;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.or-divider::before,
+.or-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background-color: #eee;
+  transform: translateY(-50%);
+}
+
+.or-divider::before {
+  left: 0;
+}
+
+.or-divider::after {
+  right: 0;
+}
+
+.modal-right-panel form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modal-right-panel input[type="email"],
+.modal-right-panel input[type="text"],
+.modal-right-panel input[type="password"] {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.modal-right-panel input[type="email"]:focus,
+.modal-right-panel input[type="text"]:focus,
+.modal-right-panel input[type="password"]:focus {
+  outline: none;
+  border-color: #00c853; /* Groww green */
+  box-shadow: 0 0 0 2px rgba(0, 200, 83, 0.2);
+}
+
+.continue-button,
+.submit-button {
+  width: 100%;
+  padding: 12px 20px;
+  background-color: #00c853; /* Groww green */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 10px; /* Add some space above buttons */
+}
+
+.continue-button:hover,
+.submit-button:hover {
+  background-color: #00a14f; /* Darker green */
+}
+
+.terms-privacy {
+  font-size: 0.75rem; /* 12px */
+  color: #777;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.terms-privacy a {
+  color: #00c853;
+  text-decoration: underline;
+}
+
+.email-display {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 15px;
+  width: 100%;
+  text-align: left;
+}
+
+.otp-resend {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 15px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resend-button {
+  background: none;
+  border: none;
+  color: #00c853; /* Groww green */
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.resend-button:hover {
+  color: #00a14f;
+}
+
+.error-message {
+  color: #d32f2f; /* Red for errors */
+  font-size: 0.8rem;
+  margin-bottom: 10px;
+  width: 100%;
+  text-align: left;
+}
+
+.password-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.password-input-container input {
+  padding-right: 40px; /* Space for potential visibility toggle */
+}
+
+.password-requirements {
+  font-size: 0.75rem; /* 12px */
+  color: #777;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  width: 100%;
+  text-align: left;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .modal-content {
+    flex-direction: column;
+    width: 95%;
+    height: auto;
+    max-height: none;
+  }
+
+  .modal-left-panel {
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    padding: 20px;
+    height: 200px; /* Fixed height for mobile left panel */
+  }
+
+  .modal-title-left {
+    font-size: 2rem; /* 32px */
+  }
+
+  .modal-subtitle-left {
+    font-size: 1rem; /* 16px */
+  }
+
+  .modal-right-panel {
+    padding: 30px 20px;
+  }
+
+  .modal-title-right {
+    font-size: 1.75rem; /* 28px */
+  }
+}
+/* Add to LoginModal.css */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes expandWidth {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes pulseSlow {
+  0%, 100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes progressBar {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes successModal {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Animation classes */
+.animate-fadeInUp {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.animate-expandWidth {
+  animation: expandWidth 0.3s ease-out;
+  transform-origin: left;
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 3s ease-in-out infinite;
+}
+
+.animate-bounce {
+  animation: bounce 0.5s ease-in-out infinite;
+}
+
+.animate-progress-bar {
+  animation: progressBar 1.5s ease-in-out;
+}
+
+.animate-success-modal {
+  animation: successModal 1.5s ease-in-out;
+}
+
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+.delay-400 {
+  animation-delay: 400ms;
+}
+
+/* Smooth transitions */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.duration-200 {
+  transition-duration: 200ms;
+}
+
+.duration-300 {
+  transition-duration: 300ms;
+}
+
+.duration-500 {
+  transition-duration: 500ms;
+}
+
+/* Hover effects */
+.hover\:scale-\[1\.02\]:hover {
+  transform: scale(1.02);
+}
+
+.hover\:scale-\[0\.98\]:hover {
+  transform: scale(0.98);
+}
+
+.active\:scale-\[0\.98\]:active {
+  transform: scale(0.98);
+}
+
+.hover\:bg-gray-100:hover {
+  background-color: #f7fafc;
+}
+
+.hover\:bg-green-50:hover {
+  background-color: #f0fff4;
+}
+
+.hover\:border-green-400:hover {
+  border-color: #68d391;
+}
+
+.group:hover .group-hover\:border-green-400 {
+  border-color: #68d391;
+}
+
+.group:hover .group-hover\:text-green-500 {
+  color: #48bb78;
+}
+
+/* Loading spinner */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

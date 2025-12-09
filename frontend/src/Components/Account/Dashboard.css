@@ -1,0 +1,91 @@
+.dashboard-container {
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.user-icon {
+  font-size: 2em;
+  cursor: pointer;
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 50%;
+  background-color: #f0f0f0;
+  transition: background-color 0.3s ease;
+}
+
+.user-icon:hover {
+  background-color: #e0e0e0;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  min-width: 300px;
+}
+
+.modal-header {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.modal-header h3 {
+  margin: 0 0 5px 0;
+  font-size: 1.2em;
+}
+
+.modal-header p {
+  margin: 0;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.modal-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.modal-items li {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modal-items li:last-child {
+  border-bottom: none;
+}
+
+.modal-items li:hover {
+  background-color: #f9f9f9;
+}
+
+.modal-items a {
+  text-decoration: none;
+  color: #333;
+  display: block;
+  padding: 5px 0;
+}
+
+.dashboard-content {
+  margin-top: 20px;
+  text-align: center;
+}
