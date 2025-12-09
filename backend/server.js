@@ -22,7 +22,7 @@ import paymentsRoutes from './routes/payments.js';
 // Import services
 import { priceTracker } from './services/priceTracker.js';
 import { db } from './config/database.js';
-
+import kafkaService from './services/kafkaService.js';
 // Initialize PriceTracker with database
 priceTracker.setDatabase(db);
 
@@ -52,7 +52,13 @@ await fastify.register(cors, {
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
 });
-
+// Initialize Kafka
+try {
+  await kafkaService.connect();
+  console.log('✅ Kafka connected successfully');
+} catch (error) {
+  console.log('⚠️ Kafka not available, running without event streaming');
+}
 await fastify.register(helmet);
 
 await fastify.register(jwt, {
@@ -193,7 +199,61 @@ fastify.get('/test-push', async (request, reply) => {
     return { success: false, error: error.message };
   }
 });
+// KAFKA TEST ROUTE HERE ↓↓↓
+fastify.get('/test-kafka', async (request, reply) => {
+  try {
+    const testEvent = {
+      service: 'finvested',
+      event: 'TEST_EVENT',
+      timestamp: new Date().toISOString(),
+      data: { 
+        message: 'Hello from Finvested Kafka!',
+        testId: Math.random().toString(36).substring(7),
+        serverTime: new Date().toLocaleString(),
+        kafkaBroker: process.env.KAFKA_BROKER || 'localhost:9092'
+      }
+    };
 
+    console.log('🚀 Sending Kafka test event...');
+    const sent = await kafkaService.sendMessage('finvested-test', testEvent);
+    
+    if (sent) {
+      return { 
+        success: true, 
+        message: 'Kafka test event sent successfully!',
+        event: testEvent,
+        topic: 'finvested-test',
+        kafkaStatus: 'connected',
+        broker: process.env.KAFKA_BROKER || 'localhost:9092'
+      };
+    } else {
+      return { 
+        success: false, 
+        message: 'Failed to send Kafka event. Check Kafka connection.',
+        kafkaStatus: 'disconnected',
+        suggestion: 'Make sure Kafka is running: docker-compose ps'
+      };
+    }
+  } catch (error) {
+    console.error('Kafka test error:', error);
+    return { 
+      success: false, 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    };
+  }
+});
+
+// Kafka health check
+fastify.get('/kafka-health', async (request, reply) => {
+  return {
+    kafkaConnected: kafkaService.isConnected,
+    broker: process.env.KAFKA_BROKER || 'localhost:9092',
+    clientId: 'finvested-backend',
+    timestamp: new Date().toISOString(),
+    topics: ['finvested-test', 'stock-prices', 'order-events', 'notifications']
+  };
+});
 // Health check
 fastify.get('/health', async (request, reply) => {
   return { 
