@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-
+import { useNavigate } from "react-router-dom";
+import { FiBarChart2 } from "react-icons/fi";
 export default function HoldingsUI() {
   // Mock data for holdings
+    const navigate = useNavigate();
   const initialHoldings = [
     {
       id: 1,
@@ -107,28 +109,31 @@ export default function HoldingsUI() {
     { key: 'invested', label: 'Invested Amount (High to Low)', icon: '💼' },
     { key: 'sector', label: 'Sector', icon: '🏢' },
   ];
+const handleAnalyticsClick = () => {
+  navigate("/portfolio"); // your analytics page route
+};
 
-  // Calculate values for selected holding
   const getSelectedHoldingDetails = (holding) => {
-    const currentValue = holding.currentPrice * holding.shares;
-    const investedValue = holding.investedPrice * holding.shares;
-    const returns = currentValue - investedValue;
-    const returnsPercent = investedValue > 0 ? (returns / investedValue) * 100 : 0;
-    const dayChange = holding.change * holding.shares;
-    const dayChangePercent = holding.changePercent;
-    const portfolioPercentage = totalPortfolioValue > 0 ? 
-      (currentValue / totalPortfolioValue) * 100 : 0;
+  const currentValue = holding.currentPrice * holding.shares;
+  const investedValue = holding.investedPrice * holding.shares;
+  const returns = currentValue - investedValue;
+  const returnsPercent = investedValue > 0 ? (returns / investedValue) * 100 : 0;
+  const dayChange = holding.change * holding.shares;
+  const dayChangePercent = holding.changePercent;
+  const portfolioPercentage = totalPortfolioValue > 0 ? 
+    (currentValue / totalPortfolioValue) * 100 : 0;
 
-    return {
-      currentValue,
-      investedValue,
-      returns,
-      returnsPercent,
-      dayChange,
-      dayChangePercent,
-      portfolioPercentage
-    };
+  return {
+    currentValue,
+    investedValue,
+    returns,
+    returnsPercent,
+    dayChange,
+    dayChangePercent,
+    portfolioPercentage
   };
+};
+
 
   // Handle holding click
   const handleHoldingClick = (holding) => {
@@ -238,7 +243,7 @@ export default function HoldingsUI() {
   const selectedDetails = getSelectedHoldingDetails(selectedHolding);
   
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-4 md:px-56 py-6 text-gray-900 font-sans">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-4 md:px-32 py-6 text-gray-900 font-sans">
       {/* Header with Portfolio Summary */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
@@ -248,6 +253,14 @@ export default function HoldingsUI() {
             </h1>
             <p className="text-gray-600 mt-1">Your investment portfolio overview</p>
           </div>
+   <button
+  onClick={handleAnalyticsClick}
+  className="ml-4 p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition"
+  title="Go to portfolio"
+>
+  <FiBarChart2 className="w-6 h-6 text-gray-700" />
+</button>
+
           <div className="text-right">
             <p className="text-sm text-gray-500">Total Portfolio Value</p>
             <p className="text-2xl font-bold tracking-tight">{formatCurrency(totalPortfolioValue)}</p>
@@ -527,28 +540,20 @@ export default function HoldingsUI() {
           </div>
 
           {/* Action Buttons */}
-          <div className="space-y-3 mt-8">
+<div className="space-y-3 mt-8 flex justify-center">
+  <button className="w-2/3 text-center font-semibold py-3.5 px-4 rounded-xl
+                    bg-white border-2 border-green-500 text-green-600
+                    hover:bg-green-50 hover:shadow-lg active:scale-[0.98]
+                    transition-all duration-300 flex items-center justify-center gap-2">
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    Verify Holdings
+  </button>
+
+
+            
            
-            
-            <button className="w-2/3 text-center font-semibold py-3.5 px-4 rounded-xl
-                              bg-white border-2 border-green-500 text-green-600
-                              hover:bg-green-50 hover:shadow-lg active:scale-[0.98]
-                              transition-all duration-300 flex items-center justify-center gap-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Verify Holdings
-            </button>
-            
-            <button className="w-full text-center font-semibold py-3.5 px-4 rounded-xl
-                              bg-gradient-to-r from-gray-100 to-gray-50 border border-gray-200
-                              text-gray-700 hover:shadow-md hover:bg-white
-                              transition-all duration-300 flex items-center justify-center gap-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-              View Reports
-            </button>
           </div>
         </div>
      

@@ -124,14 +124,18 @@ const StockDashboard = () => {
     }
   };
 
-  // Logic to slice the Most Bought Stocks array
+  // UPDATED: Show 7-8 stocks initially for Most Bought
   const mostBoughtStocksToDisplay = useMemo(() => {
     if (!mostBoughtStocks) return [];
     
-    if (showAllMostBought || mostBoughtStocks.length <= 4) {
+    // Calculate initial count based on available space
+    // We'll show 7 initially, or all if less than 8
+    const initialCount = 7;
+    
+    if (showAllMostBought || mostBoughtStocks.length <= initialCount + 1) {
       return mostBoughtStocks;
     }
-    return mostBoughtStocks.slice(0, 4);
+    return mostBoughtStocks.slice(0, initialCount);
   }, [mostBoughtStocks, showAllMostBought]);
 
   // --- Click Handlers for Stock Details ---
@@ -222,11 +226,9 @@ const StockDashboard = () => {
 
   return (
     <div className="stock-dashboard">
-      
      
-
       {/* Main Content Grid with margin top for spacing */}
-      <div className="main-content-grid">
+      <div className="w-full px-32 py-5 bg-white">
         {/* Left Column - Stocks */}
         <div className="stocks-column">
           
@@ -234,7 +236,7 @@ const StockDashboard = () => {
           <div className="stocks-section">
             <div className="section-header">
               <h3 className="section-title">Most Bought Stocks</h3>
-              {mostBoughtStocks && mostBoughtStocks.length > 4 && (
+              {mostBoughtStocks && mostBoughtStocks.length > 7 && (
                 <button 
                   className="see-all-btn"
                   onClick={() => setShowAllMostBought(!showAllMostBought)}
@@ -375,44 +377,6 @@ const StockDashboard = () => {
                 </button>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Right Column - Tools */}
-        <div className="tools-column">
-          <div className="tools-section">
-            <h3 className="section-title">Products & Tools</h3>
-            <div className="tools-list">
-              <div className="tool-category">
-                <div className="tool-category-title">Investment</div>
-                <div className="tool-items">
-                  <div className="tool-item">IPO</div>
-                  <div className="tool-item">Bonds</div>
-                  <div className="tool-item">Mutual Funds</div>
-                  <div className="tool-item">Gold</div>
-                </div>
-              </div>
-              
-              <div className="tool-category">
-                <div className="tool-category-title">Trading Tools</div>
-                <div className="tool-items">
-                  <div className="tool-item">ETF Screener</div>
-                  <div className="tool-item">Intraday Screener</div>
-                  <div className="tool-item">F&O Screener</div>
-                  <div className="tool-item">Options Chain</div>
-                </div>
-              </div>
-              
-              <div className="tool-category">
-                <div className="tool-category-title">Analytics</div>
-                <div className="tool-items">
-                  <div className="tool-item">Market Heatmap</div>
-                  <div className="tool-item">Technicals</div>
-                  <div className="tool-item">Historical Data</div>
-                  <div className="tool-item">Research Reports</div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

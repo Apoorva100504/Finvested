@@ -533,3 +533,32 @@
 body {
   font-size: 14px;
 }
+
+/* ---- FIX ALIGNMENT FOR MOVERS TABLE ---- */
+
+.movers-table .col-company {
+  width: 40%;
+  text-align: left;
+}
+
+.movers-table .col-trend {
+  width: 20%;
+  text-align: center;
+}
+
+.movers-table .col-price {
+  width: 20%;
+  text-align: center;
+}
+
+.movers-table .col-volume {
+  width: 20%;
+  text-align: center;
+}
+
+/* Ensure all table rows & cells align perfectly */
+.movers-table td,
+.movers-table th {
+  padding: 10px 12px;
+  vertical-align: middle;
+}

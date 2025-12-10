@@ -8,7 +8,6 @@ import LoginHome from "./Components/Home/LoggedInHome.jsx";
 import Holding from "./Components/Home/Holdings.jsx";
 import Noorder from "./Components/Home/Noorder.jsx";
 import Navbar from "./Components/Home/Navbar.jsx";
-import KYCForm from "./Components/login/KYCForm.jsx";
 import WalletPage from "./Components/Wallet/WalletPage.jsx";
 import Transactions from "./Components/Wallet/TransactionsPage.jsx";
 import Login from "./Components/login/LoginModal.jsx";
@@ -90,8 +89,7 @@ function App() {
             {/* Stock Details Page - ADD THIS ROUTE */}
             <Route path="/stock/:symbol" element={<StockDetailsPage />} />
             <Route path="/Noorder" element={<Noorder />} />
-            {/* KYC */}
-            <Route path="/kyc" element={<KYCForm />} />
+           
             
             {/* Wallet */}
             <Route path="/wallet" element={<WalletPage />} />

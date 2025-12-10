@@ -1,18 +1,16 @@
 
-
 import React, { useState, useEffect } from 'react';
 import StockChart from './StockChart';
-import KYCForm from '../login/KYCForm';
 import BuyModal from './BuyStock.jsx';
 import { FiPlus, FiCheck, FiX, FiChevronDown } from 'react-icons/fi';
 import { FaStar, FaRegStar } from 'react-icons/fa';
 
 const StockHeader = ({ companyName, priceInfo, historicalData, onBack }) => {
-  const [showKYC, setShowKYC] = useState(false);
+  
   const [showBuySell, setShowBuySell] = useState(false);
   const [showWatchlistDropdown, setShowWatchlistDropdown] = useState(false);
   const [showCreateWatchlist, setShowCreateWatchlist] = useState(false);
-  const [kycCompleted, setKycCompleted] = useState(false);
+  
   const [tradeType, setTradeType] = useState('buy');
   const [newWatchlistName, setNewWatchlistName] = useState('');
   const [isInWatchlist, setIsInWatchlist] = useState(false);
@@ -29,20 +27,17 @@ const StockHeader = ({ companyName, priceInfo, historicalData, onBack }) => {
   
   // Mock current stock info - extract from companyName or props
   const currentStock = {
-    symbol: companyName.split(' ')[0].toUpperCase() || 'STOCK',
-    name: companyName,
-    price: priceInfo?.lastPrice || 0,
-    change: priceInfo?.change || 0,
-    changePercent: priceInfo?.pChange || 0,
-  };
+  symbol: (companyName?.split(' ')[0] || 'STOCK').toUpperCase(),
+  name: companyName || 'Unknown',
+  price: priceInfo?.lastPrice || 0,
+  change: priceInfo?.change || 0,
+  changePercent: priceInfo?.pChange || 0,
+};
+
 
   // Load data on component mount
   useEffect(() => {
-    // Load KYC status
-    const kycStatus = localStorage.getItem('kycStatus');
-    if (kycStatus === 'verified') {
-      setKycCompleted(true);
-    }
+   
     
     // Load watchlists from localStorage or use mock data
     const savedWatchlists = localStorage.getItem('userWatchlists');
@@ -92,22 +87,10 @@ const StockHeader = ({ companyName, priceInfo, historicalData, onBack }) => {
     return `${sign}${numValue.toFixed(2)}%`;
   };
 
-  const handleUnlockStocks = () => {
-    setShowKYC(true);
-  };
+  
 
-  const handleKYCClose = () => {
-    setShowKYC(false);
-    const kycStatus = localStorage.getItem('kycStatus');
-    if (kycStatus === 'verified') {
-      setKycCompleted(true);
-    }
-  };
 
-  const handleKYCVerified = () => {
-    setKycCompleted(true);
-    setShowKYC(false);
-  };
+  
 
   const handleBuySell = (type) => {
     setTradeType(type);
@@ -207,7 +190,8 @@ const StockHeader = ({ companyName, priceInfo, historicalData, onBack }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* LEFT SIDE */}
-        <div className={kycCompleted ? "lg:col-span-2" : "lg:col-span-2 space-y-4"}>
+       <div className="lg:col-span-2 space-y-4">
+
           
           {/* Title & Price */}
           <div className="mb-2">
@@ -323,7 +307,8 @@ const StockHeader = ({ companyName, priceInfo, historicalData, onBack }) => {
             </div>
           </div>
           {/* Chart */}
-          <div className={`border border-gray-200 rounded-lg p-4 bg-white mb-4 relative ${kycCompleted ? 'h-96' : 'h-80'}`}>
+         <div className="border border-gray-200 rounded-lg p-4 bg-white mb-4 relative h-96">
+
             
            
 
@@ -353,35 +338,8 @@ const StockHeader = ({ companyName, priceInfo, historicalData, onBack }) => {
 
         {/* RIGHT SIDE */}
         <div className="space-y-4">
-          {!kycCompleted ? (
-            /* BEFORE KYC - Unlock Stocks Card */
-            <div className="relative bg-gradient-to-r from-emerald-50/80 to-green-50/80 border border-emerald-100 rounded-xl p-5 mt-16 overflow-hidden">
-              
-              <div className="absolute -top-20 -right-20 w-40 h-40 bg-emerald-200/20 rounded-full blur-2xl"></div>
-              <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-green-200/20 rounded-full blur-2xl"></div>
-
-              <div className="relative z-10 flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-emerald-100 to-green-100 rounded-lg flex items-center justify-center">
-                  <span className="text-emerald-600 text-sm font-bold">🔓</span>
-                </div>
-                <h3 className="font-bold text-gray-900 text-base">Looking to invest in stocks?</h3>
-              </div>
-
-              <p className="text-gray-600 text-xs mb-4 z-10 relative">
-                Complete KYC verification to unlock full trading features
-              </p>
-
-              <button 
-                onClick={handleUnlockStocks}
-                className="relative w-full bg-gradient-to-r from-emerald-500 to-green-500 text-white px-4 py-2.5 rounded-lg font-medium text-sm hover:from-emerald-600 hover:to-green-600 shadow-sm hover:shadow-md z-10"
-              >
-                UNLOCK STOCKS
-              </button>
-
-              <div className="absolute inset-0 border-2 border-emerald-200/30 rounded-xl pointer-events-none"></div>
-            </div>
-          ) : (
-            /* AFTER KYC - Trading Card */
+          
+           
             <div className="mt-24 ">
               
              {/* BUY/SELL MODAL (only one modal used) */}
@@ -393,18 +351,9 @@ const StockHeader = ({ companyName, priceInfo, historicalData, onBack }) => {
         currentPrice={priceInfo?.lastPrice}
       />     
             </div>
-          )}
+          
         </div>
-      </div>
-
-      {/* KYC Modal */}
-      <KYCForm 
-        isOpen={showKYC} 
-        onClose={handleKYCClose}
-        onVerified={handleKYCVerified}
-      />
-
-      
+      </div>     
 
     </div>
   );

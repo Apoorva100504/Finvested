@@ -1,6 +1,7 @@
 // src/Components/Home/LoggedInHome.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Compass, Package, ListOrdered, Star } from "lucide-react"; // ADD THIS IMPORT
 
 import WatchlistPage from "../Watchlist/Watchlist.jsx";
 import AllOrders from "../Account/AllOrders.jsx";
@@ -10,6 +11,14 @@ import Holdings from "./Holdings.jsx";
 function LoggedInHome() {
   const [activeTab, setActiveTab] = useState("explore");
   const navigate = useNavigate();
+  
+  // Tab configuration
+  const tabs = [
+    { id: "explore", label: "Explore", icon: Compass },
+    { id: "Holdings", label: "Holdings", icon: Package },
+    { id: "orders", label: "Orders", icon: ListOrdered },
+    { id: "watchlist", label: "Watchlist", icon: Star },
+  ];
 
   const CompletedOrdersWrapper = () => {
     const token = localStorage.getItem("authToken") || "";
@@ -28,43 +37,52 @@ function LoggedInHome() {
     <div className="w-full bg-white min-h-screen">
 
       {/* ===== TAB NAVBAR ===== */}
-      <div className="flex space-x-4 border-b px-4">
-        {["explore", "orders", "Holdings", "watchlist"].map((tab) => (
-          <button
-            key={tab}
-            className={`py-2 px-4 font-semibold ${
-              activeTab === tab
-                ? "border-b-2 border-blue-500 text-blue-500"
-                : "text-gray-600"
-            }`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
-          </button>
-        ))}
+      <div className="sticky top-16 z-40 bg-white/90 backdrop-blur-lg border-b border-emerald-100 shadow-sm">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex space-x-1 sm:space-x-2 overflow-x-auto py-2 scrollbar-hide">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-2 px-4 sm:px-6 py-3 rounded-xl transition-all duration-300 whitespace-nowrap ${
+                    isActive
+                      ? "bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg shadow-emerald-200"
+                      : "text-gray-600 hover:text-emerald-700 hover:bg-emerald-50"
+                  }`}
+                >
+                  <Icon className={`h-4 w-4 sm:h-5 sm:w-5 ${isActive ? 'text-white' : 'text-emerald-500'}`} />
+                  <span className="font-semibold text-sm sm:text-base">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* ===== MARKET INDEX STRIP (Below Tab Navbar) ===== */}
-      <div className="w-full border-b py-5 px-24 text-xs flex justify-between items-center mb-4 bg-white">
+      <div className="w-full border-b py-5 px-4 md:px-8 lg:px-24 text-xs flex justify-between items-center mb-4 bg-white overflow-x-auto">
         {indices.map((item) => {
           const isPositive = item.change >= 0;
 
           return (
-            <div key={item.name} className="flex items-center space-x-1">
-              <span className="font-medium text-gray-800 text-[11px]">
+            <div key={item.name} className="flex items-center space-x-1 px-2">
+              <span className="font-medium text-gray-800 text-[11px] whitespace-nowrap">
                 {item.name}
               </span>
 
-              <span className="text-gray-700 text-[11px]">
-                {item.price}
+              <span className="text-gray-700 text-[11px] whitespace-nowrap">
+                {item.price.toLocaleString('en-IN')}
               </span>
 
               <span
-                className={`font-medium text-[11px] ${
+                className={`font-medium text-[11px] whitespace-nowrap ${
                   isPositive ? "text-green-500" : "text-red-500"
                 }`}
               >
-                {item.change} ({item.percent}%)
+                {item.change.toFixed(2)} ({item.percent.toFixed(2)}%)
               </span>
             </div>
           );
@@ -78,6 +96,16 @@ function LoggedInHome() {
         {activeTab === "orders" && <CompletedOrdersWrapper />}
         {activeTab === "watchlist" && <WatchlistPage />}
       </div>
+      
+      <style jsx>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 }
