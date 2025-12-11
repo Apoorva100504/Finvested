@@ -70,11 +70,9 @@ import { authenticate } from './middleware/authMiddleware.js';
 // Decorate fastify with authenticate method
 fastify.decorate('authenticate', authenticate);
 
-// Register routes (existing code)
-fastify.register(authRoutes, { prefix: '/api/v1' });
 // Register routes - ORGANIZED WITH PROPER PREFIXES
-// await fastify.register(authRoutes, { prefix: '/api/v1' });
-await fastify.register(userRoutes, { prefix: '/api/v1/users' }); // CHANGED: Added /users prefix
+await fastify.register(authRoutes, { prefix: '/api/v1' });
+await fastify.register(userRoutes, { prefix: '/api/v1/users' });
 await fastify.register(portfolioRoutes, { prefix: '/api/v1' });
 await fastify.register(walletRoutes, { prefix: '/api/v1' });
 await fastify.register(stocksRoutes, { prefix: '/api/v1' });
@@ -84,6 +82,10 @@ await fastify.register(analyticsRoutes, { prefix: '/api/v1' });
 await fastify.register(alertsRoutes, { prefix: '/api/v1' });
 await fastify.register(paymentsRoutes, { prefix: '/api/v1/payments' });
 
+// Test route for debugging
+fastify.get('/api/v1/test-auth', async (request, reply) => {
+  return { message: 'Auth routes are working', timestamp: new Date().toISOString() };
+});
 // API Documentation endpoint (simple text-based)
 fastify.get('/docs', async (request, reply) => {
   return {

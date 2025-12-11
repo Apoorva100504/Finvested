@@ -112,9 +112,12 @@ export class EmailService {
     }
   }
   static async sendOTPEmail(userEmail, otpCode) {
+  console.log('📤 Attempting to send OTP email to:', userEmail);
+  console.log('🔑 Using API Key from env:', process.env.SENDGRID_API_KEY ? 'Present' : 'Missing');
+  
   const msg = {
     to: userEmail,
-    from: 'apoorva@finestcoder.com',
+    from: process.env.SENDGRID_FROM_EMAIL || 'apoorva@finestcoder.com',
     subject: 'Verify Your Email - Finvested',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -132,12 +135,16 @@ export class EmailService {
     `,
   };
 
-  try {
-    await sgMail.send(msg);
-    console.log(`✅ OTP email sent to ${userEmail}`);
+   try {
+    console.log('📧 Sending email via SendGrid...');
+    const response = await sgMail.send(msg);
+    console.log('✅ Email sent successfully:', response[0].statusCode);
     return true;
   } catch (error) {
-    console.error('❌ OTP email error:', error);
+    console.error('❌ SendGrid error details:');
+    console.error('Status Code:', error.code);
+    console.error('Message:', error.message);
+    console.error('Response Body:', error.response?.body);
     return false;
   }
 }
