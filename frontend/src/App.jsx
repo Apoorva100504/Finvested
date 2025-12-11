@@ -31,7 +31,7 @@ import StockDashboard from "./Components/StockDashboard/StockDashboard.jsx";
 // Stock Details Page - ADD THIS IMPORT
 import StockDetailsPage from "./Components/StockDashboard/StockDetailsPage.jsx";
 import Buy from "./Components/StockDashboard/BuyStock.jsx";
-import Sell from "./Components/StockDashboard/Sellstock.jsx";
+
 function App() {
   useEffect(() => {
     const vapidKey = "BNuO8ul1x-GKuOpEDPGkBBv911cMJJ30P1wcxx1Tp0WhkZ7jsQ9RyUi26YGAzTuYGDR2HUAILm9wYaVnZ4PUHVQ";
@@ -102,7 +102,7 @@ function App() {
             <Route path="/reports" element={<Reports />} />
             <Route path="/logout" element={<Logout />} />
             <Route path="/buy" element={<Buy />} />
-            <Route path="/sell" element={<Sell />} />
+            
             {/* Portfolio */}
             <Route path="/portfolio" element={<PortfolioPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />

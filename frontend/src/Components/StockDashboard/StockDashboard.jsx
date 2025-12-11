@@ -282,7 +282,13 @@ const StockDashboard = () => {
     }
   };
 
-  
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setLastUpdated(new Date());
+      setIsRefreshing(false);
+    }, 1000);
+  };
 
   const formatTime = (date) => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -321,9 +327,9 @@ const StockDashboard = () => {
   };
 
   const getChangeClass = (change) => {
-    if (change > 0) return 'text-green-600 bg-green-50';
-    if (change < 0) return 'text-red-600 bg-red-50';
-    return 'text-gray-600 bg-gray-50';
+    if (change > 0) return 'text-green-600 bg-green-50 border-green-200';
+    if (change < 0) return 'text-red-600 bg-red-50 border-red-200';
+    return 'text-gray-600 bg-gray-50 border-gray-200';
   };
 
   const getChangeColor = (change) => {
@@ -347,10 +353,10 @@ const StockDashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="gradient-hover flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="relative">
-          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-          <div className="absolute inset-0 w-16 h-16 border-4 border-blue-200 border-t-transparent rounded-full animate-spin" style={{ animationDelay: '0.1s' }}></div>
+          <div className="w-16 h-16 border-4 border-[#48E1C4] border-t-[#5064FF] rounded-full animate-spin"></div>
+          <div className="absolute inset-0 w-16 h-16 border-4 border-[#48E1C4]/20 border-t-[#5064FF]/20 rounded-full animate-spin" style={{ animationDelay: '0.1s' }}></div>
         </div>
         <p className="mt-6 text-gray-600 font-medium animate-pulse">Loading real-time market data...</p>
         <p className="mt-2 text-sm text-gray-500">Fetching live stock prices and indices</p>
@@ -364,7 +370,7 @@ const StockDashboard = () => {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white border border-red-200 rounded-xl p-8 max-w-md text-center shadow-lg"
+          className="gradient-hover bg-white border border-red-200 rounded-xl p-8 max-w-md text-center shadow-lg"
         >
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-2xl">⚠️</span>
@@ -374,7 +380,11 @@ const StockDashboard = () => {
           <div className="flex gap-3 justify-center">
             <button 
               onClick={handleRefresh} 
-              className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-md hover:shadow-lg font-medium"
+              className="gradient-hover px-6 py-3 
+                        bg-gradient-to-r from-[#48E1C4] via-[#5064FF] to-[#48E1C4] 
+                        text-white rounded-lg font-medium
+                        hover:from-[#5064FF] hover:via-[#48E1C4] hover:to-[#5064FF]
+                        transition-all duration-300 shadow-md hover:shadow-lg"
             >
               ↻ Retry Connection
             </button>
@@ -387,165 +397,154 @@ const StockDashboard = () => {
   const activeStocks = getActiveStocks();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 px-32">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 px-16">
       {/* Animated Background Elements */}
-     {/* Animated Background Elements */}
-<div className="fixed inset-0 overflow-hidden pointer-events-none">
-  <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#48E1C4]/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
-  <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-[#5064FF]/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
-  <div className="absolute bottom-1/4 left-1/2 w-64 h-64 bg-[#48E1C4]/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
-</div>
-
-{/* Main Content */}
-<div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-  {/* Header */}
-  <motion.header 
-    initial={{ opacity: 0, y: -20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5 }}
-    className="mb-8"
-  >
-    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-      <div>
-        <p className="font-semibold text-gray-600 mt-1">
-          {formatDate(lastUpdated)} • Last updated: {formatTime(lastUpdated)}
-        </p>
-      </div>
-    </div>
-  </motion.header>
-
-  {/* Most Bought Stocks Section */}
-  <motion.section
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5, delay: 0.1 }}
-    className="mb-8"
-  >
-    <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100/50 p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-600">
-            <span className="font-semibold bg-gradient-to-r from-[#5064FF] to-[#5064FF] bg-clip-text text-transparent leading-tight"></span>
-            Most Bought Stocks
-          </h2>
-          <p className="text-gray-600 text-sm mt-1">
-            Today's highest trading volume stocks
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="bg-gradient-to-r from-[#48E1C4]/20 via-[#5064FF]/20 to-[#48E1C4]/20 text-transparent bg-clip-text px-3 py-1.5 rounded-full text-sm font-medium border border-[#48E1C4]/30">
-            {mostBoughtStocks?.length || 0} stocks
-          </span>
-          {mostBoughtStocks && mostBoughtStocks.length > 5 && (
-            <motion.button 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="font-medium text-sm flex items-center gap-1 text-transparent bg-clip-text bg-gradient-to-r from-[#48E1C4] via-[#5064FF] to-[#48E1C4] hover:from-[#5064FF] hover:via-[#48E1C4] hover:to-[#5064FF] transition-colors duration-300"
-              onClick={() => setShowAllMostBought(!showAllMostBought)}
-            >
-              {showAllMostBought ? 'Show Less' : 'See All'}
-              <span className={`transition-transform duration-300 ${showAllMostBought ? 'rotate-180' : ''}`}>▼</span>
-            </motion.button>
-          )}
-        </div>
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#48E1C4]/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+        <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-[#5064FF]/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-1/4 left-1/2 w-64 h-64 bg-[#48E1C4]/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
       </div>
 
-
-      {mostBoughtLoading ? (
-        <div className="text-center py-8">
-          <div className="inline-block w-8 h-8 border-2 border-[#48E1C4]/30 border-t-[#5064FF] rounded-full animate-spin"></div>
-          <p className="text-[#5064FF]/70 mt-2">Loading most bought data...</p>
-        </div>
-      ) : mostBoughtStocksToDisplay.length > 0 ? (
-        <motion.div 
-          layout
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4"
+      {/* Main Content */}
+      <div className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Header */}
+        <motion.header 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-8"
         >
-          {mostBoughtStocksToDisplay.map((stock, index) => (
-            <motion.div
-              key={stock.symbol}
-              layout
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-              whileHover={{ 
-                y: -8,
-                boxShadow: '0 20px 40px -15px rgba(72, 225, 196, 0.3)'
-              }}
-              className="bg-gradient-to-br from-white to-gray-50 hover:from-[#48E1C4]/10 hover:to-[#5064FF]/10 rounded-xl p-4 cursor-pointer transition-all duration-300 border border-[#48E1C4]/20 h-[140px] flex flex-col justify-between relative overflow-hidden group"
-              onClick={() => handleStockClick(stock)}
-            >
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+           
+              
+              <p className="font-semibold text-gray-600 mt-1">
+                {formatDate(lastUpdated)} • Last updated: {formatTime(lastUpdated)}
+              </p>
+            
+          </div>
+        </motion.header>
 
-                    {/* Hover effect background */}
-<div className="absolute inset-0 
-                bg-gradient-to-r from-[#48E1C4]/0 via-[#5064FF]/10 to-[#48E1C4]/0 
-                translate-x-[-100%] group-hover:translate-x-[100%] 
-                transition-transform duration-1000 rounded-lg"></div>
+        {/* Most Bought Stocks Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="mb-8"
+        >
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100/50 p-6">
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-600">
+                  Most Bought Stocks
+                </h2>
+                <p className="text-gray-600 text-sm mt-1">
+                  Today's highest trading volume stocks
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="gradient-hover bg-gradient-to-r from-[#48E1C4]/20 via-[#5064FF]/20 to-[#48E1C4]/20 text-transparent bg-clip-text px-3 py-1.5 rounded-full text-sm font-medium border border-[#48E1C4]/30">
+                  {mostBoughtStocks?.length || 0} stocks
+                </span>
+                {mostBoughtStocks && mostBoughtStocks.length > 5 && (
+                  <motion.button 
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="text-gradient-hover font-medium text-sm flex items-center gap-1
+                              bg-gradient-to-r from-[#48E1C4] via-[#5064FF] to-[#48E1C4] 
+                              hover:from-[#5064FF] hover:via-[#48E1C4] hover:to-[#5064FF] 
+                              transition-colors duration-300"
+                    onClick={() => setShowAllMostBought(!showAllMostBought)}
+                  >
+                    {showAllMostBought ? 'Show Less' : 'See All'}
+                    <span className={`transition-transform duration-300 ${showAllMostBought ? 'rotate-180' : ''}`}>▼</span>
+                  </motion.button>
+                )}
+              </div>
+            </div>
 
-{/* Stock Logo with shine effect */}
-<div className="absolute top-3 right-3 w-10 h-10 group-hover:scale-110 transition-transform duration-300">
-  <div className="relative">
-    <img 
-      src={getStockLogo(stock.symbol)} 
-      alt={stock.symbol}
-      className="w-full h-full rounded-lg object-cover border border-gray-200 shadow-sm group-hover:shadow-md transition-all duration-300"
-      onError={(e) => {
-        e.target.style.display = 'none';
-        e.target.nextElementSibling.style.display = 'flex';
-      }}
-    />
-    <div 
-      className="w-full h-full rounded-lg flex items-center justify-center text-white font-bold text-lg hidden shadow-inner"
-      style={{ backgroundColor: getStockColor(stock.symbol) }}
-    >
-      {getStockInitial(stock.symbol)}
-    </div>
-    {/* Gradient shine overlay */}
-    <div className="absolute inset-0 
-                    bg-gradient-to-tr from-transparent via-[#48E1C4]/20 to-transparent 
-                    opacity-0 group-hover:opacity-100 
-                    transition-opacity duration-300 rounded-lg"></div>
-  </div>
-</div>
+            {mostBoughtLoading ? (
+              <div className="text-center py-8">
+                <div className="inline-block w-8 h-8 border-2 border-[#48E1C4]/30 border-t-[#5064FF] rounded-full animate-spin"></div>
+                <p className="text-[#5064FF]/70 mt-2">Loading most bought data...</p>
+              </div>
+            ) : mostBoughtStocksToDisplay.length > 0 ? (
+              <motion.div 
+                layout
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4"
+              >
+                {mostBoughtStocksToDisplay.map((stock, index) => (
+                  <motion.div
+                    key={stock.symbol}
+                    layout
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                    className="gradient-hover stock-card-hover bg-gradient-to-br from-white to-gray-50 rounded-xl p-4 cursor-pointer transition-all duration-300 border border-[#48E1C4]/20 h-[140px] flex flex-col justify-between relative overflow-hidden group"
+                    onClick={() => handleStockClick(stock)}
+                  >
+                    {/* Stock Logo with shine effect */}
+                    <div className="logo-hover absolute top-3 right-3 w-10 h-10">
+                      <div className="relative">
+                        <img 
+                          src={getStockLogo(stock.symbol)} 
+                          alt={stock.symbol}
+                          className="w-full h-full rounded-lg object-cover border border-gray-200 shadow-sm group-hover:shadow-md transition-all duration-300"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextElementSibling.style.display = 'flex';
+                          }}
+                        />
+                        <div 
+                          className="w-full h-full rounded-lg flex items-center justify-center text-white font-bold text-lg hidden shadow-inner"
+                          style={{ backgroundColor: getStockColor(stock.symbol) }}
+                        >
+                          {getStockInitial(stock.symbol)}
+                        </div>
+                        {/* Gradient shine overlay */}
+                        <div className="absolute inset-0 
+                                        bg-gradient-to-tr from-transparent via-[#48E1C4]/20 to-transparent 
+                                        opacity-0 group-hover:opacity-100 
+                                        transition-opacity duration-300 rounded-lg"></div>
+                      </div>
+                    </div>
 
-{/* Stock Info */}
-<div className="pr-12 relative z-10">
-  <div className="font-bold text-gray-800 text-sm 
-                  group-hover:text-[#5064FF] transition-colors">
-    {stock.symbol}
-  </div>
-  <div className="text-xs text-gray-600 truncate 
-                  group-hover:text-[#48E1C4] transition-colors">
-    {stock.companyName || stock.symbol}
-  </div>
-</div>
+                    {/* Stock Info */}
+                    <div className="pr-12 relative z-10">
+                      <div className="font-bold text-gray-800 text-sm 
+                                    group-hover:text-[#5064FF] transition-colors">
+                        {stock.symbol}
+                      </div>
+                      <div className="text-xs text-gray-600 truncate 
+                                    group-hover:text-[#48E1C4] transition-colors">
+                        {stock.companyName || stock.symbol}
+                      </div>
+                    </div>
 
-                   {/* Stock Details with pulse animation for price changes */}
-<div className="pr-12 relative z-10 group">
-  {/* Last Price */}
-  <div className="font-semibold text-lg text-gray-900 transition-colors group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#48E1C4] group-hover:via-[#5064FF] group-hover:to-[#48E1C4]">
-    {formatCurrency(stock.priceInfo?.lastPrice)}
-  </div>
+                    {/* Stock Details with pulse animation for price changes */}
+                    <div className="pr-12 relative z-10 group">
+                      {/* Last Price */}
+                      <div className="text-gradient-hover font-semibold text-lg text-gray-900
+                                    bg-gradient-to-r from-[#48E1C4] via-[#5064FF] to-[#48E1C4]">
+                        {formatCurrency(stock.priceInfo?.lastPrice)}
+                      </div>
 
-  {/* Percentage Change Badge */}
-  <motion.div 
-    initial={false}
-    animate={{ 
-      scale: stock.priceInfo?.pChange !== 0 ? [1, 1.1, 1] : 1 
-    }}
-    transition={{ 
-      duration: 0.5,
-      repeat: stock.priceInfo?.pChange !== 0 ? Infinity : 0,
-      repeatDelay: 3 
-    }}
-    className={`text-xs font-medium px-3 py-1.5 rounded-full inline-block mt-1 border ${getChangeClass(stock.priceInfo?.pChange)}
-                text-gray-900 transition-all duration-300
-                group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#48E1C4] group-hover:via-[#5064FF] group-hover:to-[#48E1C4]`}
-  >
-    {formatPercentage(stock.priceInfo?.pChange)}
-  </motion.div>
-</div>
-
+                      {/* Percentage Change Badge */}
+                      <motion.div 
+                        initial={false}
+                        animate={{ 
+                          scale: stock.priceInfo?.pChange !== 0 ? [1, 1.1, 1] : 1 
+                        }}
+                        transition={{ 
+                          duration: 0.5,
+                          repeat: stock.priceInfo?.pChange !== 0 ? Infinity : 0,
+                          repeatDelay: 3 
+                        }}
+                        className={`text-gradient-hover text-xs font-medium px-3 py-1.5 rounded-full inline-block mt-1 border ${getChangeClass(stock.priceInfo?.pChange)}
+                                  bg-gradient-to-r from-[#48E1C4] via-[#5064FF] to-[#48E1C4]`}
+                      >
+                        {formatPercentage(stock.priceInfo?.pChange)}
+                      </motion.div>
+                    </div>
                   </motion.div>
                 ))}
               </motion.div>
@@ -577,15 +576,19 @@ const StockDashboard = () => {
                 <p className="text-gray-600 text-sm mt-1">Real-time gainers, losers & volume shockers</p>
               </div>
               <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
+                <span className="gradient-hover text-sm text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
                   {activeTab === 'gainers' ? '📈 Top Gainers' : 
                    activeTab === 'losers' ? '📉 Top Losers' : '📊 Volume Shockers'}
                 </span>
-                <div className="flex bg-gray-100 p-1 rounded-xl">
+                <div className="gradient-hover flex bg-gray-100 p-1 rounded-xl">
                   <motion.button 
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 ${activeTab === 'gainers' ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg' : 'text-gray-700 hover:text-gray-900 hover:bg-white/50'}`}
+                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 ${
+                      activeTab === 'gainers' 
+                        ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg' 
+                        : 'bg-white text-gray-700 hover:text-gray-900 border border-gray-200'
+                    }`}
                     onClick={() => setActiveTab('gainers')}
                   >
                     Gainers
@@ -593,7 +596,11 @@ const StockDashboard = () => {
                   <motion.button 
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 ${activeTab === 'losers' ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg' : 'text-gray-700 hover:text-gray-900 hover:bg-white/50'}`}
+                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 ${
+                      activeTab === 'losers' 
+                        ? 'bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-lg' 
+                        : 'bg-white text-gray-700 hover:text-gray-900 border border-gray-200'
+                    }`}
                     onClick={() => setActiveTab('losers')}
                   >
                     Losers
@@ -601,7 +608,11 @@ const StockDashboard = () => {
                   <motion.button 
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 ${activeTab === 'volume' ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg' : 'text-gray-700 hover:text-gray-900 hover:bg-white/50'}`}
+                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 ${
+                      activeTab === 'volume' 
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg' 
+                        : 'bg-white text-gray-700 hover:text-gray-900 border border-gray-200'
+                    }`}
                     onClick={() => setActiveTab('volume')}
                   >
                     Volume
@@ -614,7 +625,7 @@ const StockDashboard = () => {
             <div className="overflow-x-auto rounded-xl border border-gray-200/50">
               <table className="w-full">
                 <thead>
-                  <tr className="bg-gradient-to-r from-gray-50 to-gray-100/50 border-b border-gray-200">
+                  <tr className="gradient-hover bg-gradient-to-r from-gray-50 to-gray-100/50 border-b border-gray-200">
                     <th className="text-left py-4 px-6 font-semibold text-gray-600 text-xs uppercase tracking-wider w-[45%]">Company</th>
                     <th className="text-center py-4 px-2 font-semibold text-gray-600 text-xs uppercase tracking-wider w-[15%]">Trend (1D)</th> 
                     <th className="text-right py-4 px-6 font-semibold text-gray-600 text-xs uppercase tracking-wider w-[20%]">Market Price</th>
@@ -629,16 +640,12 @@ const StockDashboard = () => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.3, delay: index * 0.05 }}
-                        whileHover={{ 
-                          backgroundColor: 'rgba(59, 130, 246, 0.05)',
-                          transition: { duration: 0.2 }
-                        }}
-                        className="border-b border-gray-100 hover:bg-blue-50/50 cursor-pointer transition-colors"
+                        className="gradient-hover stock-card-hover border-b border-gray-100 hover:bg-gradient-to-r hover:from-[#48E1C4]/5 hover:via-white hover:to-[#5064FF]/5 cursor-pointer relative"
                         onClick={() => handleStockClick(stock)}
                       >
                         <td className="py-4 px-6">
                           <div className="flex items-center gap-4">
-                            <div className="relative w-12 h-12 flex-shrink-0">
+                            <div className="logo-hover relative w-12 h-12 flex-shrink-0">
                               <img 
                                 src={getStockLogo(stock.symbol)} 
                                 alt={stock.symbol}
@@ -662,7 +669,8 @@ const StockDashboard = () => {
                                   repeat: stock.pChange !== 0 ? Infinity : 0,
                                   repeatDelay: 3 
                                 }}
-                                className={`text-xs font-medium px-3 py-1 rounded-full inline-block mt-2 ${getChangeClass(stock.pChange)}`}
+                                className={`text-gradient-hover text-xs font-medium px-3 py-1 rounded-full inline-block mt-2 ${getChangeClass(stock.pChange)}
+                                          bg-gradient-to-r from-[#48E1C4] via-[#5064FF] to-[#48E1C4]`}
                               >
                                 {stock.pChange >= 0 ? '+' : ''}{stock.change.toFixed(2)} ({stock.pChange.toFixed(2)}%)
                               </motion.div>
@@ -670,7 +678,7 @@ const StockDashboard = () => {
                           </div>
                         </td>
                         <td className="py-4 px-2 text-center">
-                          <div className="flex justify-center">
+                          <div className="gradient-hover flex justify-center">
                             <div className={`w-20 h-8 flex items-center justify-center ${stock.pChange > 0 ? 'bg-green-50' : stock.pChange < 0 ? 'bg-red-50' : 'bg-gray-50'} rounded-lg border`}>
                               <svg width="60" height="20" viewBox="0 0 60 20" className={getChangeColor(stock.pChange)}>
                                 {stock.pChange > 0 ? (
@@ -697,20 +705,26 @@ const StockDashboard = () => {
                           </div>
                         </td>
                         <td className="py-4 px-6 text-right">
-                          <div className="font-bold text-gray-800 text-lg">₹{stock.price.toFixed(2)}</div>
+                          <div className="text-gradient-hover font-bold text-gray-800 text-lg
+                                        bg-gradient-to-r from-[#48E1C4] via-[#5064FF] to-[#48E1C4]">
+                            ₹{stock.price.toFixed(2)}
+                          </div>
                           <div className="text-xs text-gray-500">
                             {stock.dayHigh ? `H: ₹${stock.dayHigh.toFixed(2)}` : ''}
                           </div>
                         </td>
                         <td className="py-4 px-6 text-right">
                           <div className="flex flex-col items-end gap-2">
-                            <div className="text-blue-600 font-semibold text-sm">{getVolumeChangePercentage(stock)}%</div>
+                            <div className="text-gradient-hover text-blue-600 font-semibold text-sm
+                                          bg-gradient-to-r from-[#48E1C4] via-[#5064FF] to-[#48E1C4]">
+                              {getVolumeChangePercentage(stock)}%
+                            </div>
                             <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
                               <motion.div 
                                 initial={{ width: 0 }}
                                 animate={{ width: `${Math.min(100, getVolumeChangePercentage(stock))}%` }}
                                 transition={{ duration: 1, delay: index * 0.1 }}
-                                className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
+                                className="h-full bg-gradient-to-r from-[#48E1C4] via-[#5064FF] to-[#48E1C4] rounded-full"
                               ></motion.div>
                             </div>
                             <div className="text-xs text-gray-600">{formatVolume(stock.volume)}</div>
@@ -738,7 +752,12 @@ const StockDashboard = () => {
                 <motion.button 
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-6 py-2.5 bg-gradient-to-r from-gray-100 to-gray-50 hover:from-gray-200 hover:to-gray-100 text-gray-700 rounded-xl font-medium transition-all duration-300 border border-gray-200 shadow-sm hover:shadow"
+                  className="gradient-hover px-6 py-2.5 
+                            bg-gradient-to-r from-gray-100 to-gray-50 
+                            hover:from-gray-200 hover:to-gray-100 
+                            text-gray-700 rounded-xl font-medium 
+                            transition-all duration-300 border border-gray-200 
+                            shadow-sm hover:shadow"
                   onClick={() => setShowAllMovers(!showAllMovers)} 
                 >
                   {showAllMovers ? 'Show Less' : 'See More'}
@@ -767,7 +786,7 @@ const StockDashboard = () => {
                 </div>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full lg:w-auto">
                   {/* Search Box */}
-                  <div className="relative w-full sm:w-56">
+                  <div className="gradient-hover relative w-full sm:w-56">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <span className="text-gray-400">🔍</span>
                     </div>
@@ -776,14 +795,14 @@ const StockDashboard = () => {
                       placeholder="Search stocks by symbol or name..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
+                      className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#5064FF] focus:border-transparent shadow-sm"
                       whileFocus={{ scale: 1.02 }}
                     />
                     {searchTerm && (
                       <motion.button 
                         initial={{ opacity: 0, scale: 0 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[#5064FF] transition-colors"
                         onClick={() => setSearchTerm('')}
                       >
                         ✕
@@ -793,11 +812,11 @@ const StockDashboard = () => {
                   
                   {/* Sort Controls */}
                   <div className="flex items-center gap-2">
-                    <div className="relative">
+                    <div className="gradient-hover relative">
                       <select 
                         value={sortBy}
                         onChange={(e) => handleSort(e.target.value)}
-                        className="px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white pr-10 shadow-sm"
+                        className="px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#5064FF] focus:border-transparent appearance-none bg-white pr-10 shadow-sm"
                       >
                         <option value="name">Sort by: Name</option>
                         <option value="price">Sort by: Price</option>
@@ -811,7 +830,7 @@ const StockDashboard = () => {
                     <motion.button 
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      className="px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-bold hover:bg-gray-50 shadow-sm"
+                      className="gradient-hover px-4 py-2.5 border border-gray-300 rounded-xl text-sm font-bold hover:bg-[#48E1C4]/10 shadow-sm"
                       onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
                     >
                       {sortOrder === 'asc' ? '↑' : '↓'}
@@ -823,7 +842,12 @@ const StockDashboard = () => {
                     <motion.button 
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="px-5 py-2.5 bg-gradient-to-r from-gray-100 to-gray-50 hover:from-gray-200 hover:to-gray-100 text-gray-700 rounded-xl font-medium transition-all duration-300 border border-gray-200 shadow-sm hover:shadow"
+                      className="gradient-hover px-5 py-2.5 
+                                bg-gradient-to-r from-gray-100 to-gray-50 
+                                hover:from-gray-200 hover:to-gray-100 
+                                text-gray-700 rounded-xl font-medium 
+                                transition-all duration-300 border border-gray-200 
+                                shadow-sm hover:shadow"
                       onClick={() => setShowAllStocks(!showAllStocks)}
                     >
                       {showAllStocks ? '📄 Paginated' : '📋 Show All'}
@@ -837,17 +861,19 @@ const StockDashboard = () => {
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-gradient-to-r from-blue-50 to-blue-100/50 border border-blue-200 rounded-xl p-4 mb-6"
+                  className="gradient-hover bg-gradient-to-r from-[#48E1C4]/10 via-white to-[#5064FF]/10 border border-[#48E1C4]/30 rounded-xl p-4 mb-6"
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-blue-700 font-medium">
+                      <p className="text-[#5064FF] font-medium">
                         Found {sortedStocks.length} stock{sortedStocks.length !== 1 ? 's' : ''} matching "{searchTerm}"
                       </p>
-                      <p className="text-blue-600 text-sm mt-1">Click on any stock to view detailed analysis</p>
+                      <p className="text-[#48E1C4] text-sm mt-1">Click on any stock to view detailed analysis</p>
                     </div>
                     <button 
-                      className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                      className="text-gradient-hover text-sm font-medium
+                                bg-gradient-to-r from-[#48E1C4] via-[#5064FF] to-[#48E1C4] 
+                                hover:from-[#5064FF] hover:via-[#48E1C4] hover:to-[#5064FF]"
                       onClick={() => setSearchTerm('')}
                     >
                       Clear search
@@ -860,7 +886,7 @@ const StockDashboard = () => {
                 <>
                   <motion.div 
                     layout
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6"
+                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10 mb-6"
                   >
                     {paginatedRemainingStocks.map((stock, index) => (
                       <motion.div
@@ -869,18 +895,11 @@ const StockDashboard = () => {
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.2, delay: index * 0.03 }}
-                        whileHover={{ 
-                          y: -6,
-                          boxShadow: '0 20px 40px -15px rgba(139, 92, 246, 0.2)'
-                        }}
-                        className="bg-gradient-to-br from-white to-gray-50 hover:from-purple-50/30 hover:to-white rounded-xl p-4 cursor-pointer transition-all duration-300 border border-gray-200/50 hover:border-purple-200 h-[140px] flex flex-col justify-between relative overflow-hidden group"
+                        className="gradient-hover stock-card-hover bg-gradient-to-br from-white to-gray-50 rounded-xl p-4 cursor-pointer border border-gray-200/50 hover:border-[#48E1C4]/30 h-[140px] flex flex-col justify-between relative overflow-hidden group"
                         onClick={() => handleStockClick(stock)}
                       >
-                        {/* Gradient overlay on hover */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-purple-500/5 to-purple-500/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-                        
                         {/* Stock Logo */}
-                        <div className="absolute top-3 right-3 w-10 h-10 group-hover:rotate-12 transition-transform duration-300">
+                        <div className="logo-hover absolute top-3 right-3 w-10 h-10">
                           <div className="relative">
                             <img 
                               src={getStockLogo(stock.symbol)} 
@@ -897,18 +916,24 @@ const StockDashboard = () => {
                             >
                               {getStockInitial(stock.symbol)}
                             </div>
+                            {/* Shine effect overlay */}
+                            <div className="absolute inset-0 
+                                            bg-gradient-to-tr from-transparent via-[#48E1C4]/10 to-transparent 
+                                            opacity-0 group-hover:opacity-100 
+                                            transition-opacity duration-300 rounded-lg"></div>
                           </div>
                         </div>
                         
                         {/* Stock Info */}
                         <div className="pr-12 relative z-10">
-                          <div className="font-bold text-gray-800 text-sm group-hover:text-purple-700 transition-colors">{stock.symbol}</div>
-                          <div className="text-xs text-gray-600 truncate group-hover:text-gray-800 transition-colors">{stock.companyName || stock.symbol}</div>
+                          <div className="font-bold text-gray-800 text-sm group-hover:text-[#5064FF] transition-colors">{stock.symbol}</div>
+                          <div className="text-xs text-gray-600 truncate group-hover:text-[#48E1C4] transition-colors">{stock.companyName || stock.symbol}</div>
                         </div>
                         
                         {/* Stock Details */}
                         <div className="pr-12 relative z-10">
-                          <div className="font-semibold text-gray-800 text-lg group-hover:text-purple-800 transition-colors">
+                          <div className="text-gradient-hover font-semibold text-gray-800 text-lg
+                                        bg-gradient-to-r from-[#48E1C4] via-[#5064FF] to-[#48E1C4]">
                             {formatCurrency(stock.priceInfo?.lastPrice)}
                           </div>
                           <motion.div 
@@ -921,7 +946,8 @@ const StockDashboard = () => {
                               repeat: stock.priceInfo?.pChange !== 0 ? Infinity : 0,
                               repeatDelay: 3 
                             }}
-                            className={`text-xs font-medium px-3 py-1.5 rounded-full inline-block mt-1 border ${getChangeClass(stock.priceInfo?.pChange)}`}
+                            className={`text-gradient-hover text-xs font-medium px-3 py-1.5 rounded-full inline-block mt-1 border ${getChangeClass(stock.priceInfo?.pChange)}
+                                      bg-gradient-to-r from-[#48E1C4] via-[#5064FF] to-[#48E1C4]`}
                           >
                             {formatPercentage(stock.priceInfo?.pChange)}
                           </motion.div>
@@ -940,7 +966,7 @@ const StockDashboard = () => {
                       <motion.button 
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-300 ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 hover:from-gray-200 hover:to-gray-100 shadow-sm hover:shadow'}`}
+                        className={`gradient-hover px-5 py-2.5 rounded-xl font-medium transition-all duration-300 ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 hover:from-gray-200 hover:to-gray-100 shadow-sm hover:shadow'}`}
                         onClick={handlePrevPage}
                         disabled={currentPage === 1}
                       >
@@ -965,7 +991,7 @@ const StockDashboard = () => {
                               key={pageNum}
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
-                              className={`w-10 h-10 flex items-center justify-center rounded-lg font-medium transition-all duration-300 ${currentPage === pageNum ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-gray-200 shadow-sm hover:shadow'}`}
+                              className={`gradient-hover w-10 h-10 flex items-center justify-center rounded-lg font-medium transition-all duration-300 ${currentPage === pageNum ? 'bg-gradient-to-r from-[#48E1C4] to-[#5064FF] text-white shadow-lg' : 'bg-gray-100 text-gray-700 hover:bg-[#48E1C4]/10 shadow-sm hover:shadow'}`}
                               onClick={() => handlePageClick(pageNum)}
                             >
                               {pageNum}
@@ -985,7 +1011,7 @@ const StockDashboard = () => {
                       <motion.button 
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-300 ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 hover:from-gray-200 hover:to-gray-100 shadow-sm hover:shadow'}`}
+                        className={`gradient-hover px-5 py-2.5 rounded-xl font-medium transition-all duration-300 ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 hover:from-gray-200 hover:to-gray-100 shadow-sm hover:shadow'}`}
                         onClick={handleNextPage}
                         disabled={currentPage === totalPages}
                       >
@@ -995,7 +1021,7 @@ const StockDashboard = () => {
                   )}
                 </>
               ) : (
-                <div className="text-center py-12">
+                <div className="gradient-hover text-center py-12">
                   <div className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span className="text-3xl">🔍</span>
                   </div>
@@ -1054,9 +1080,76 @@ const StockDashboard = () => {
           animation-delay: 4s;
         }
         
+        /* Gradient hover effect */
+        .gradient-hover {
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .gradient-hover::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, 
+            transparent 0%, 
+            rgba(72, 225, 196, 0.1) 25%, 
+            rgba(80, 100, 255, 0.1) 50%, 
+            rgba(72, 225, 196, 0.1) 75%, 
+            transparent 100%
+          );
+          transition: transform 0.8s ease;
+          z-index: 0;
+        }
+        
+        .gradient-hover:hover::before {
+          transform: translateX(100%);
+        }
+        
+        /* Card hover effects */
+        .stock-card-hover {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .stock-card-hover:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 20px 40px -15px rgba(72, 225, 196, 0.25);
+        }
+        
+        /* Logo hover effect */
+        .logo-hover {
+          transition: all 0.3s ease;
+        }
+        
+        .logo-hover:hover {
+          transform: scale(1.1) rotate(5deg);
+        }
+        
+        /* Text gradient on hover */
+        .text-gradient-hover {
+          background-clip: text;
+          -webkit-background-clip: text;
+          transition: background-position 0.3s ease;
+          background-size: 200% 100%;
+          background-position: 0% 0%;
+          display: inline-block;
+        }
+        
+        .text-gradient-hover:hover {
+          background-position: 100% 0%;
+        }
+        
         /* Smooth transitions */
         * {
           transition: background-color 0.2s ease-in-out;
+        }
+        
+        /* Ensure text remains visible over gradient */
+        .gradient-hover > *:not(:before) {
+          position: relative;
+          z-index: 1;
         }
       `}</style>
     </div>
