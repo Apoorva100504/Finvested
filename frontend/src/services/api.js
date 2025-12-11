@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -29,13 +29,13 @@ api.interceptors.response.use(
       localStorage.removeItem('authToken');
       localStorage.removeItem('userData');
       localStorage.removeItem('isLoggedIn');
-      
+
       // Redirect to login if not already there
       if (!window.location.pathname.includes('/login')) {
         window.location.href = '/login';
       }
     }
-    
+
     // Return error with message
     return Promise.reject({
       message: error.response?.data?.error || 'An error occurred',

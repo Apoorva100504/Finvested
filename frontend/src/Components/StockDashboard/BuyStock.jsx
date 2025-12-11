@@ -5,7 +5,7 @@ export default function GrowwBuySellUI({ stockPrice = 151.64 }) {
   const [mode, setMode] = useState("buy");
   const [priceType, setPriceType] = useState("limit"); // limit | market
   const [quantity, setQuantity] = useState(1);
-  const [limitPrice, setLimitPrice] = useState(stockPrice.toFixed(2));
+  const [limitPrice, setLimitPrice] = useState(0);
   const [userBalance, setUserBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   
@@ -107,7 +107,7 @@ export default function GrowwBuySellUI({ stockPrice = 151.64 }) {
             <p className="text-xs text-gray-500 mt-1 flex items-center gap-1 mt-3">
               <span className="font-medium">NSE ₹{stockPrice.toFixed(2)}</span>
               <span className="text-green-600 font-medium">· BSE ₹{(stockPrice * 1.002).toFixed(2)} (+0.53%)</span>
-              <span className="underline text-blue-600 cursor-pointer hover:text-blue-800 transition-colors ml-1">Depth</span>
+              
             </p>
           </div>
           
@@ -200,7 +200,7 @@ export default function GrowwBuySellUI({ stockPrice = 151.64 }) {
      
 
       {/* Balance Info with loading state */}
-      <div className="flex justify-between px-4 py-3 text-xs border-t border-gray-100">
+      <div className="flex justify-between px-4 py-3 text-xs border-t border-gray-100 pt-8">
         <div>
           <p className="text-gray-600 mb-1">Available Balance</p>
           {loading ? (
@@ -231,25 +231,58 @@ export default function GrowwBuySellUI({ stockPrice = 151.64 }) {
           </button>
         ) : (
           <button
-            onClick={handleAction}
-            disabled={loading || (priceType === "limit" && !limitPrice)}
-            className={`w-full py-3 rounded-lg text-white font-semibold text-sm shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 ${
-              isBuy 
-                ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700" 
-                : "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
-            }`}
-          >
-            <span>{isBuy ? "Buy Now" : "Sell Now"}</span>
-            {isBuy ? (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
-            )}
-          </button>
+  onClick={handleAction}
+  disabled={loading || (priceType === "limit" && !limitPrice)}
+  className={`relative w-full py-3 rounded-lg text-white font-semibold text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2 overflow-hidden group ${
+    isBuy 
+      ? "bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 hover:from-green-600 hover:via-emerald-600 hover:to-green-700" 
+      : "bg-gradient-to-r from-red-500 via-rose-500 to-red-600 hover:from-red-600 hover:via-rose-600 hover:to-red-700"
+  }`}
+>
+  {/* Buy Button Effects (Green) */}
+  {isBuy && (
+    <>
+      {/* Lit effect overlay for buy */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-t from-green-300/20 via-transparent to-emerald-500/10"></div>
+      {/* Top highlight for buy */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-300 to-emerald-300"></div>
+      {/* Subtle light spots for buy */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+        <div className="absolute top-1/4 left-1/4 w-12 h-12 rounded-full bg-green-300/10 blur-xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-10 h-10 rounded-full bg-emerald-400/10 blur-xl"></div>
+      </div>
+    </>
+  )}
+  
+  {/* Sell Button Effects (Red) */}
+  {!isBuy && (
+    <>
+      {/* Glow effect overlay for sell */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-t from-red-300/20 via-transparent to-rose-500/10"></div>
+      {/* Top highlight for sell */}
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-300 to-rose-300"></div>
+      {/* Subtle glow spots for sell */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+        <div className="absolute top-1/4 left-1/4 w-12 h-12 rounded-full bg-red-300/10 blur-xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-10 h-10 rounded-full bg-rose-400/10 blur-xl"></div>
+      </div>
+    </>
+  )}
+  
+  {/* Shimmer effect on hover (works for both) */}
+  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+  
+  <span className="relative flex items-center gap-2">
+    {isBuy ? "Buy Now" : "Sell Now"}
+    <svg className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      {isBuy ? (
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+      ) : (
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+      )}
+    </svg>
+  </span>
+</button>
         )}
         
         {/* Disclaimer */}

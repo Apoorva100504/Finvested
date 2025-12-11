@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Logo from "../../assets/Logo.png";
 import LoginModal from "../login/LoginModal.jsx";
+import Dashboard from "../Account/Dashboard.jsx"
 import { Search, Bell, ChevronDown, User, LogOut, TrendingUp, CheckCircle, AlertTriangle, ArrowRight } from "lucide-react";
 
 const Navbar = () => {
@@ -209,10 +210,15 @@ const Navbar = () => {
                   <div className="absolute -inset-2 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full opacity-0 group-hover:opacity-20 blur-md transition-opacity duration-300"></div>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent leading-tight">
-                    Finvested
-                  </span>
-                  <span className="text-[10px] text-gray-500 font-medium tracking-wider">
+                 <span className=" text-3xl font-bold
+    bg-gradient-to-r from-neonBlue via-aquaMintDark to-neonBlue
+    bg-clip-text text-transparent
+    transition-all duration-300
+    group-hover:tracking-wide">
+  Finvested
+</span>
+
+                  <span className="text-sm font-bold bg-gradient-to-r from-[#5064FF] to-[#5064FF] bg-clip-text text-transparent leading-tight">
                     SMART INVESTING
                   </span>
                 </div>
@@ -251,17 +257,23 @@ const Navbar = () => {
               {!isLoggedIn ? (
                 <div className="flex items-center space-x-3">
                   <button
-                    onClick={openLoginModal}
-                    className="px-5 py-2.5 text-sm font-semibold text-emerald-600 border-2 border-emerald-600 rounded-xl hover:bg-emerald-50 hover:border-emerald-700 hover:text-emerald-700 active:scale-95 transition-all duration-200 shadow-sm"
-                  >
-                    Log In
-                  </button>
-                  <button
-                    onClick={openSignupModal}
-                    className="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-green-500 rounded-xl hover:shadow-lg hover:shadow-emerald-200 hover:from-emerald-700 hover:to-green-600 active:scale-95 transition-all duration-200 shadow-md"
-                  >
-                    Sign Up Free
-                  </button>
+  onClick={openLoginModal}
+  className="px-5 py-2.5 text-sm font-semibold text-[#5064FF] border-2 border-[#5064FF] rounded-xl 
+             hover:bg-[#E6E8FF] hover:border-[#3948E0] hover:text-[#3948E0] active:scale-95 
+             transition-all duration-200 shadow-sm"
+>
+  Log In
+</button>
+
+<button
+  onClick={openSignupModal}
+  className="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-aquaMintDark to-neonBlue 
+             rounded-xl hover:shadow-lg hover:shadow-neonBlue/30 hover:from-neonBlue hover:to-aquaMintDark 
+             active:scale-95 transition-all duration-200 shadow-md"
+>
+  Sign Up Free
+</button>
+
                 </div>
               ) : (
                 <div className="flex items-center space-x-4">
@@ -401,63 +413,12 @@ const Navbar = () => {
 
                     {/* User Dropdown Menu */}
                     {isDashboardModalOpen && (
-                      <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50">
-                        <div className="px-4 py-3 border-b border-gray-100">
-                          <div className="flex items-center space-x-3">
-                            <div className="h-10 w-10 bg-gradient-to-br from-emerald-500 to-green-600 text-white rounded-full flex items-center justify-center font-bold">
-                              {getUserInitials()}
-                            </div>
-                            <div>
-                              <p className="font-semibold text-gray-800">
-                                {userEmail ? userEmail.split('@')[0] : "User"}
-                              </p>
-                              <p className="text-sm text-gray-500 truncate">
-                                {userEmail}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="py-2">
-                          <Link
-                            to="/portfolio"
-                            className="flex items-center space-x-3 px-4 py-2.5 hover:bg-gray-50 text-gray-700 hover:text-emerald-600 transition-colors"
-                          >
-                            <User className="h-4 w-4" />
-                            <span className="text-sm font-medium">My Portfolio</span>
-                          </Link>
-                          <Link
-                            to="/profile"
-                            className="flex items-center space-x-3 px-4 py-2.5 hover:bg-gray-50 text-gray-700 hover:text-emerald-600 transition-colors"
-                          >
-                            <User className="h-4 w-4" />
-                            <span className="text-sm font-medium">Account Settings</span>
-                          </Link>
-                          <Link
-                            to="/notifications"
-                            className="flex items-center space-x-3 px-4 py-2.5 hover:bg-gray-50 text-gray-700 hover:text-emerald-600 transition-colors relative"
-                          >
-                            <Bell className="h-4 w-4" />
-                            <span className="text-sm font-medium">Notifications</span>
-                            {unreadCount > 0 && (
-                              <span className="absolute right-4 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
-                                {unreadCount}
-                              </span>
-                            )}
-                          </Link>
-                        </div>
-                        
-                        <div className="border-t border-gray-100 pt-2">
-                          <button
-                            onClick={handleLogout}
-                            className="flex items-center space-x-3 w-full px-4 py-2.5 hover:bg-red-50 text-red-600 hover:text-red-700 transition-colors rounded-lg mx-2"
-                          >
-                            <LogOut className="h-4 w-4" />
-                            <span className="text-sm font-medium">Log Out</span>
-                          </button>
-                        </div>
-                      </div>
-                    )}
+  <Dashboard
+    isDashboardModalOpen={isDashboardModalOpen}
+    onToggleDashboardModal={toggleDashboardModal}
+  />
+)}
+
                   </div>
                 </div>
               )}

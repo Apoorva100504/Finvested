@@ -264,7 +264,7 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-4 md:px-56 py-8 font-sans text-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 px-4 md:px-32 py-8 font-sans text-gray-900">
       {/* Header */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">

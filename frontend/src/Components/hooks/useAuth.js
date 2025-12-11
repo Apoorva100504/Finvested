@@ -1,3 +1,5 @@
+
+
 // hooks/useAuth.js
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +12,7 @@ export const useAuth = () => {
     loading: false,
     error: null
   });
-  
+
   const navigate = useNavigate();
 
   // Initialize auth state from localStorage on mount
@@ -19,7 +21,7 @@ export const useAuth = () => {
       const token = localStorage.getItem('authToken');
       const userStr = localStorage.getItem('user');
       const isLoggedIn = localStorage.getItem('isLoggedIn');
-      
+
       if (token && userStr && isLoggedIn === 'true') {
         try {
           const user = JSON.parse(userStr);
@@ -31,9 +33,20 @@ export const useAuth = () => {
             error: null
           });
         } catch (error) {
-          console.error('Error parsing user data:', error);
-          logout();
-        }
+  console.error('Error parsing user data:', error);
+  // Clear localStorage without triggering logout event
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('user');
+  localStorage.removeItem('isLoggedIn');
+  localStorage.removeItem('userEmail');
+  setAuth({
+    user: null,
+    token: null,
+    isAuthenticated: false,
+    loading: false,
+    error: null
+  });
+}
       }
     };
 
@@ -47,7 +60,7 @@ export const useAuth = () => {
         localStorage.setItem('user', JSON.stringify(user));
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('userEmail', user.email);
-        
+
         setAuth(prev => ({
           ...prev,
           user,
@@ -75,7 +88,7 @@ export const useAuth = () => {
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('userEmail', userData.email);
-    
+
     setAuth({
       user: userData,
       token: authToken,
@@ -83,9 +96,9 @@ export const useAuth = () => {
       loading: false,
       error: null
     });
-    
-    window.dispatchEvent(new CustomEvent('userLoggedIn', { 
-      detail: { user: userData, token: authToken } 
+
+    window.dispatchEvent(new CustomEvent('userLoggedIn', {
+      detail: { user: userData, token: authToken }
     }));
   }, []);
 
@@ -95,7 +108,7 @@ export const useAuth = () => {
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('userEmail');
     localStorage.removeItem('fcmToken');
-    
+
     setAuth({
       user: null,
       token: null,
@@ -103,7 +116,7 @@ export const useAuth = () => {
       loading: false,
       error: null
     });
-    
+
     window.dispatchEvent(new CustomEvent('userLoggedOut'));
     navigate('/');
   }, [navigate]);
@@ -114,16 +127,16 @@ export const useAuth = () => {
       try {
         const currentUser = JSON.parse(currentUserStr);
         const mergedUser = { ...currentUser, ...updatedData };
-        
+
         localStorage.setItem('user', JSON.stringify(mergedUser));
-        
+
         setAuth(prev => ({
           ...prev,
           user: mergedUser
         }));
-        
-        window.dispatchEvent(new CustomEvent('userUpdated', { 
-          detail: { user: mergedUser } 
+
+        window.dispatchEvent(new CustomEvent('userUpdated', {
+          detail: { user: mergedUser }
         }));
       } catch (error) {
         console.error('Error updating user data:', error);
@@ -172,7 +185,7 @@ export const useAuth = () => {
     error: auth.error,
     userId,
     userEmail,
-    
+
     // Actions
     login,
     logout,
@@ -180,11 +193,11 @@ export const useAuth = () => {
     setLoading: setAuthLoading,
     setError: setAuthError,
     clearError: clearAuthError,
-    
+
     // Getters
     isKycVerified,
     getUserName,
-    
+
     // Additional helper
     checkAuth: () => {
       const token = localStorage.getItem('authToken');

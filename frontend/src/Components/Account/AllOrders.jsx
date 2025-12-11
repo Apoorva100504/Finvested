@@ -164,7 +164,7 @@ export default function AllOrders({ apiBaseUrl = "", authToken = "" }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-emerald-50/20 px-5 py-7">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-emerald-50/20 px-32 py-7">
       <div className="max-w-[1400px] mx-auto space-y-7">
         {/* Header */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
