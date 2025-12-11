@@ -42,7 +42,9 @@ function LoggedOutHome() {
             </p>
 
             <button
-              className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-200"
+              className="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-aquaMintDark to-neonBlue 
+             rounded-xl hover:shadow-lg hover:shadow-neonBlue/30 hover:from-neonBlue hover:to-aquaMintDark 
+             active:scale-95 transition-all duration-200 shadow-md"
               onClick={handleOpenLoginModal}
             >
               Get started

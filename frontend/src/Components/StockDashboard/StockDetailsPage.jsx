@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import "./StockDetailsPage.css"
 import { useStockDetails } from '../hooks/useStockData';
 import StockHeader from './StockHeader';
 import OverviewSection from './OverviewSection';
@@ -10,136 +12,172 @@ const StockDetailsPage = ({ stockSymbol, onBack }) => {
   const { stock, loading, error, historicalData, refresh } = useStockDetails(stockSymbol);
   const [chartLoading, setChartLoading] = useState(true);
 
-  // Debug logs
-  useEffect(() => {
-    console.log('StockDetailsPage - loading:', loading);
-    console.log('StockDetailsPage - stock:', stock);
-    console.log('StockDetailsPage - historicalData length:', historicalData?.length);
-  }, [loading, stock, historicalData]);
-
   useEffect(() => {
     if (historicalData && historicalData.length > 0) {
       setChartLoading(false);
     }
   }, [historicalData]);
 
-  // Add floating green particles effect
   const renderFloatingEffects = () => (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-      {/* Green gradient orbs */}
-      <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-emerald-200/20 to-green-200/10 rounded-full blur-3xl"></div>
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-emerald-100/15 to-green-100/10 rounded-full blur-3xl"></div>
-      
-      {/* Floating particles */}
-      {[...Array(8)].map((_, i) => (
-        <div
-          key={i}
-          className="absolute w-1 h-1 bg-emerald-300/30 rounded-full animate-float"
-          style={{
-            left: `${10 + (i * 12)}%`,
-            top: `${20 + (i * 8)}%`,
-            animationDelay: `${i * 0.5}s`,
-            animationDuration: `${3 + (i % 3)}s`
-          }}
-        ></div>
-      ))}
+    <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#48E1C4]/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+      <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-[#5064FF]/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+      <div className="absolute bottom-1/4 left-1/2 w-64 h-64 bg-[#48E1C4]/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
     </div>
   );
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen px-4 md:px-8 lg:px-16 relative overflow-hidden">
-        {/* Green loading background effects */}
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/30 to-green-50/20"></div>
-        <div className="absolute -top-32 -right-32 w-64 h-64 bg-emerald-200/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-32 -left-32 w-64 h-64 bg-green-200/20 rounded-full blur-3xl"></div>
+      <div className="flex flex-col items-center justify-center min-h-screen px-4 md:px-8 lg:px-16 relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
+        {renderFloatingEffects()}
         
         <div className="relative z-10">
-          {/* Animated green loading spinner */}
-          <div className="relative">
-            <div className="animate-spin rounded-full h-20 w-20 border-4 border-emerald-100"></div>
-            <div className="absolute top-0 left-0 animate-spin rounded-full h-20 w-20 border-t-4 border-green-500"></div>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="relative"
+          >
+            <motion.div 
+              className="animate-spin rounded-full h-20 w-20 border-4 border-[#5064FF]/20"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+            />
+            <motion.div 
+              className="absolute top-0 left-0 animate-spin rounded-full h-20 w-20 border-t-4 border-[#5064FF]"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            />
+          </motion.div>
           
-          <p className="mt-8 text-lg font-medium text-gray-800">Loading stock details...</p>
-          <p className="mt-2 text-sm text-gray-600">Fetching {stockSymbol || 'stock'} data</p>
+          <motion.p 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-8 text-lg font-medium text-gray-800"
+          >
+            Loading stock details...
+          </motion.p>
+          <motion.p 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mt-2 text-sm text-[#5064FF]"
+          >
+            Fetching {stockSymbol || 'stock'} data
+          </motion.p>
           
-          {/* Green animated dots */}
           <div className="mt-6 flex gap-2 justify-center">
-            <div className="h-3 w-3 bg-gradient-to-br from-emerald-400 to-green-400 rounded-full animate-pulse"></div>
-            <div className="h-3 w-3 bg-gradient-to-br from-emerald-400 to-green-400 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-            <div className="h-3 w-3 bg-gradient-to-br from-emerald-400 to-green-400 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+            <motion.div 
+              className="h-3 w-3 bg-gradient-to-br from-[#5064FF] to-[#48E1C4] rounded-full"
+              animate={{ scale: [1, 1.5, 1] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0 }}
+            />
+            <motion.div 
+              className="h-3 w-3 bg-gradient-to-br from-[#5064FF] to-[#48E1C4] rounded-full"
+              animate={{ scale: [1, 1.5, 1] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
+            />
+            <motion.div 
+              className="h-3 w-3 bg-gradient-to-br from-[#5064FF] to-[#48E1C4] rounded-full"
+              animate={{ scale: [1, 1.5, 1] }}
+              transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
+            />
           </div>
           
-          {/* Progress bar */}
-          <div className="mt-8 w-64 h-2 bg-emerald-100 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-emerald-400 to-green-500 rounded-full animate-progress"></div>
-          </div>
+          <motion.div 
+            className="mt-8 w-64 h-2 bg-[#5064FF]/10 rounded-full overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            <motion.div 
+              className="h-full bg-gradient-to-r from-[#5064FF] to-[#48E1C4] rounded-full"
+              initial={{ width: "0%" }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 2, ease: "easeInOut" }}
+            />
+          </motion.div>
         </div>
-        
-        <style jsx>{`
-          @keyframes progress {
-            0% { width: 0%; }
-            50% { width: 70%; }
-            100% { width: 100%; }
-          }
-          .animate-progress {
-            animation: progress 2s ease-in-out infinite;
-          }
-          @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-          }
-          .animate-float {
-            animation: float 3s ease-in-out infinite;
-          }
-        `}</style>
       </div>
     );
   }
 
   if (error || !stock) {
     return (
-      <div className="min-h-screen px-4 md:px-8 lg:px-24 flex items-center justify-center relative overflow-hidden">
-        {/* Green error background effects */}
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/40 to-green-50/30"></div>
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-emerald-200/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-green-200/20 rounded-full blur-3xl"></div>
+      <div className="min-h-screen px-4 md:px-8 lg:px-24 flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
+        {renderFloatingEffects()}
         
-        <div className="relative z-10 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 max-w-md w-full border border-emerald-100">
-          <div className="relative">
-            <div className="absolute -top-8 -right-8 w-16 h-16 bg-gradient-to-br from-emerald-100 to-green-100 rounded-full flex items-center justify-center">
-              <span className="text-3xl">⚠️</span>
-            </div>
-          </div>
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="relative z-10 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 max-w-md w-full border border-gray-100/50 gradient-hover"
+        >
+          <motion.div 
+            className="absolute -top-8 -right-8 w-16 h-16 bg-gradient-to-br from-[#5064FF]/10 to-[#48E1C4]/10 rounded-full flex items-center justify-center"
+            animate={{ rotate: [0, 10, -10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <span className="text-3xl">⚠️</span>
+          </motion.div>
           
           <h3 className="text-2xl font-bold text-gray-800 mb-3 mt-4">Unable to load stock details</h3>
-          <p className="text-gray-600 mb-8">{error || 'Stock data not available'}</p>
+          <motion.p 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-gray-600 mb-8"
+          >
+            {error || 'Stock data not available'}
+          </motion.p>
           
           <div className="space-y-4">
-            <button 
-              className="w-full px-6 py-4 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl hover:from-emerald-600 hover:to-green-600 font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            <motion.button 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full px-6 py-4 bg-gradient-to-r from-[#5064FF] to-[#48E1C4] text-white rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
               onClick={onBack}
             >
               ← Back to Dashboard
-            </button>
-            <button 
-              className="w-full px-6 py-4 bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 rounded-xl hover:from-emerald-100 hover:to-green-100 font-medium transition-all duration-300 border border-emerald-200 hover:border-emerald-300 flex items-center justify-center gap-2"
+            </motion.button>
+            <motion.button 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full px-6 py-4 bg-gradient-to-r from-[#5064FF]/5 to-[#48E1C4]/5 text-[#5064FF] rounded-xl font-medium transition-all duration-300 border border-[#5064FF]/20 hover:border-[#5064FF]/40 flex items-center justify-center gap-2"
               onClick={refresh}
             >
-              <span className="text-lg">🔄</span>
+              <motion.span 
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="text-lg"
+              >
+                🔄
+              </motion.span>
               Try Again
-            </button>
+            </motion.button>
           </div>
           
-          {/* Green status indicator */}
-          <div className="mt-8 p-4 bg-gradient-to-r from-emerald-50/80 to-green-50/80 rounded-lg border border-emerald-200">
-            <p className="text-sm text-emerald-700 flex items-center gap-2">
-              <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="mt-8 p-4 bg-gradient-to-r from-[#5064FF]/5 to-[#48E1C4]/5 rounded-lg border border-[#5064FF]/20"
+          >
+            <p className="text-sm text-[#5064FF] flex items-center gap-2">
+              <motion.span 
+                className="w-2 h-2 bg-[#5064FF] rounded-full"
+                animate={{ scale: [1, 1.5, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              />
               Real-time data connection
             </p>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     );
   }
@@ -150,103 +188,128 @@ const StockDetailsPage = ({ stockSymbol, onBack }) => {
   const financials = stock.financials || {};
 
   return (
-    <div className="min-h-screen px-4 md:px-8 lg:px-24 space-y-8 pb-32 relative">
-      {/* Green background effects */}
+    <div className="min-h-screen px-4 md:px-8 lg:px-24 space-y-8 pb-32 relative bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
       {renderFloatingEffects()}
       
-      {/* Green gradient overlay at top */}
-      <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-emerald-50/40 to-transparent pointer-events-none z-0"></div>
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-[#5064FF]/10 via-[#48E1C4]/5 to-transparent pointer-events-none z-0"
+      />
       
       <div className="relative z-10">
-        {/* Stock Header with Chart */}
-        <StockHeader 
-          companyName={stock.companyName || stock.symbol}
-          priceInfo={priceInfo}
-          historicalData={historicalData}
-          fundamentals={fundamentals}
-          isLoading={chartLoading}
-          onBack={onBack}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <StockHeader 
+            companyName={stock.companyName || stock.symbol}
+            priceInfo={priceInfo}
+            historicalData={historicalData}
+            fundamentals={fundamentals}
+            isLoading={chartLoading}
+            onBack={onBack}
+          />
+        </motion.div>
 
-        {/* Green separator */}
-        <div className="my-8 flex items-center">
-          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-emerald-200 to-transparent"></div>
-          <div className="mx-4 px-4 py-2 bg-gradient-to-r from-emerald-50 to-green-50 rounded-full border border-emerald-200">
-            <span className="text-sm font-medium text-emerald-700">Investment Insights</span>
-          </div>
-          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-emerald-200 to-transparent"></div>
-        </div>
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="my-8 flex items-center"
+        >
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#5064FF]/20 to-transparent"></div>
+          <motion.div 
+            className="mx-4 px-4 py-2 bg-gradient-to-r from-[#5064FF]/5 to-[#48E1C4]/5 rounded-full border border-[#5064FF]/20"
+            whileHover={{ scale: 1.05 }}
+          >
+            <span className="text-sm font-medium text-[#5064FF]">Investment Insights</span>
+          </motion.div>
+          <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#5064FF]/20 to-transparent"></div>
+        </motion.div>
 
-        {/* Overview Section */}
-        <OverviewSection 
-          priceInfo={priceInfo}
-          fundamentals={fundamentals}
-          marketDepth={marketDepth}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <OverviewSection 
+            priceInfo={priceInfo}
+            fundamentals={fundamentals}
+            marketDepth={marketDepth}
+          />
+        </motion.div>
 
-        {/* Market Depth Section */}
-        <MarketDepthSection 
-          marketDepth={marketDepth}
-          priceInfo={priceInfo}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <MarketDepthSection 
+            marketDepth={marketDepth}
+            priceInfo={priceInfo}
+          />
+        </motion.div>
 
-        {/* Green success indicator */}
-        <div className="my-8 p-6 bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl border border-emerald-200 shadow-sm">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="my-8 p-6 bg-gradient-to-r from-[#5064FF]/5 to-[#48E1C4]/5 rounded-2xl border border-[#5064FF]/20 shadow-sm gradient-hover"
+          whileHover={{ scale: 1.01 }}
+        >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-emerald-100 to-green-100 rounded-xl flex items-center justify-center">
+            <motion.div 
+              className="w-12 h-12 bg-gradient-to-br from-[#5064FF]/10 to-[#48E1C4]/10 rounded-xl flex items-center justify-center"
+              whileHover={{ rotate: 5, scale: 1.1 }}
+            >
               <span className="text-xl">📊</span>
-            </div>
+            </motion.div>
             <div>
               <h4 className="font-semibold text-gray-800">Live Market Data</h4>
               <p className="text-sm text-gray-600">Real-time updates • Secure connection • Verified sources</p>
             </div>
             <div className="ml-auto flex items-center gap-2">
-              <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-              <span className="text-xs font-medium text-emerald-600">Active</span>
+              <motion.div 
+                className="w-2 h-2 bg-[#5064FF] rounded-full"
+                animate={{ scale: [1, 1.5, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              />
+              <span className="text-xs font-medium text-[#5064FF]">Active</span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Fundamentals Section */}
-        <FundamentalsSection 
-          fundamentals={fundamentals}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+        >
+          <FundamentalsSection 
+            fundamentals={fundamentals}
+          />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.7 }}
+        >
+          <FinancialsSection 
+            financialData={financials}
+          />
+        </motion.div>
+
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="fixed bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#5064FF]/10 to-transparent pointer-events-none z-0"
         />
-
-        {/* Financials Section */}
-        <FinancialsSection 
-          financialData={financials}
-        />
-
-        {/* Bottom green gradient */}
-        <div className="fixed bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-emerald-50/30 to-transparent pointer-events-none z-0"></div>
       </div>
 
-      {/* Add CSS for animations */}
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(5deg); }
-        }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes pulse-glow {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.6; }
-        }
-        .animate-pulse-glow {
-          animation: pulse-glow 2s ease-in-out infinite;
-        }
-        
-        .hover-lift {
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .hover-lift:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.1);
-        }
-      `}</style>
+      
     </div>
   );
 };

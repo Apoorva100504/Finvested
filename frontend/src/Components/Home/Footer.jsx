@@ -121,10 +121,12 @@ function Footer() {
               <h3 className="text-lg font-semibold text-gray-900">Download the App</h3>
               <button
                 onClick={handleDownloadClick}
-                className="flex items-center justify-center space-x-3 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+               
               >
-                <FaDownload className="w-5 h-5" />
-                <span className="font-semibold">Get Groww App</span>
+               
+                <span className="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-aquaMintDark to-neonBlue 
+             rounded-xl hover:shadow-lg hover:shadow-neonBlue/30 hover:from-neonBlue hover:to-aquaMintDark 
+             active:scale-95 transition-all duration-200 shadow-md">Get Groww App</span>
               </button>
               <p className="text-xs text-gray-600 mt-2">
                 Available on iOS and Android
