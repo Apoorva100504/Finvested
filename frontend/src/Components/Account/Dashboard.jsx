@@ -88,11 +88,11 @@ const Dashboard = ({ isDashboardModalOpen, onToggleDashboardModal }) => {
         onClick={onToggleDashboardModal}
       >
         {/* MODAL BOX with dynamic height */}
-        <div
-          className="w-80 bg-white rounded-xl shadow-2xl m-4 overflow-hidden border border-gray-200"
-          onClick={(e) => e.stopPropagation()}
-          style={{ height: "auto" }}
-        >
+       <div
+  className="w-80 bg-white rounded-xl shadow-2xl m-4 overflow-hidden border border-gray-200 max-h-fit"
+  onClick={(e) => e.stopPropagation()}
+>
+
           {/* USER INFO with hover effects */}
           <div className="p-5 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
             {loading ? (

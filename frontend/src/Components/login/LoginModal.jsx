@@ -335,82 +335,82 @@ function LoginModal({ isOpen, onClose, mode: initialMode = "login", onLoginSucce
     }
   };
 
-  // Login submit - connects to /login
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setSuccessMessage("");
-    setShakeError(false);
+ const handleLoginSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
+  setSuccessMessage("");
+  setShakeError(false);
 
-    // Basic validation
-    if (!email || !email.includes("@")) {
-      setError("Please enter a valid email address");
-      setShakeError(true);
-      setTimeout(() => setShakeError(false), 500);
-      return;
-    }
+  // Basic validation
+  if (!email || !email.includes("@")) {
+    setError("Please enter a valid email address");
+    setShakeError(true);
+    setTimeout(() => setShakeError(false), 500);
+    return;
+  }
 
-    if (!password || password.length < 6) {
-      setError("Password must be at least 6 characters");
-      setShakeError(true);
-      setTimeout(() => setShakeError(false), 500);
-      return;
-    }
+  if (!password || password.length < 6) {
+    setError("Password must be at least 6 characters");
+    setShakeError(true);
+    setTimeout(() => setShakeError(false), 500);
+    return;
+  }
 
-    setLoading(true);
-    
-    try {
-      // ✅ BACKEND ENDPOINT: POST /login
-      const response = await api.post("/login", {
-        email: email.toLowerCase().trim(),
-        password
+  setLoading(true);
+  
+  try {
+    // ✅ BACKEND ENDPOINT: POST /login
+    const response = await api.post("/auth/login", {
+      email: email.toLowerCase().trim(),
+      password
+    });
+
+    if (response.data.token && response.data.user) {
+      // Store token and user data
+      localStorage.setItem("authToken", response.data.token);
+      localStorage.setItem("userData", JSON.stringify(response.data.user));
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("loginProvider", "email");
+      localStorage.setItem("userEmail", response.data.user.email); // ✅ ADDED
+      
+      // Dispatch login event for Navbar
+      const loginEvent = new CustomEvent('userLoggedIn', { 
+        detail: { 
+          email: response.data.user.email,
+          userData: response.data.user, // ✅ ADDED
+          provider: "email"
+        } 
       });
-
-      if (response.data.token && response.data.user) {
-        // Store token and user data
-        localStorage.setItem("authToken", response.data.token);
-        localStorage.setItem("userData", JSON.stringify(response.data.user));
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("loginProvider", "email");
-        
-        // Dispatch login event for Navbar
-        const loginEvent = new CustomEvent('userLoggedIn', { 
-          detail: { 
-            email: response.data.user.email,
-            provider: "email"
-          } 
-        });
-        window.dispatchEvent(loginEvent);
-        
-        // Trigger success animation
-        setSuccessAnimation(true);
-        
-        // Login the user
-        if (login) login(response.data.user, response.data.token);
-        
-        // Notify parent component of successful login
-        if (onLoginSuccess) {
-          onLoginSuccess(response.data.user);
-        }
-        
-        // Close modal after success animation
-        setTimeout(() => {
-          onClose();
-          navigate(redirectPath);
-        }, 1500);
-      } else {
-        throw new Error("Invalid response from server");
+      window.dispatchEvent(loginEvent);
+      
+      // Trigger success animation
+      setSuccessAnimation(true);
+      
+      // Login the user
+      if (login) login(response.data.user, response.data.token);
+      
+      // Notify parent component of successful login
+      if (onLoginSuccess) {
+        onLoginSuccess(response.data.user);
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      setError(error.response?.data?.error || "Login failed. Please try again.");
-      setShakeError(true);
-      setTimeout(() => setShakeError(false), 500);
-    } finally {
-      setLoading(false);
+      
+      // Close modal after success animation
+      setTimeout(() => {
+        onClose();
+        navigate(redirectPath);
+      }, 1500);
+    } else {
+      throw new Error("Invalid response from server");
     }
-  };
-
+  } catch (error) {
+    console.error("Login error:", error);
+    setError(error.response?.data?.error || "Login failed. Please try again.");
+    setShakeError(true);
+    setTimeout(() => setShakeError(false), 500);
+  } finally {
+    setLoading(false);
+  }
+};
   // Handle signup completion
   const handleSignupComplete = async (signupData) => {
     const { token, user } = signupData;

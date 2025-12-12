@@ -218,7 +218,7 @@ const SignupFlow = ({
 
     try {
       setLoading(true);
-      await api.post("/send-verification", { email });
+      await api.post("/auth/send-verification", { email });
       setCurrentStep("otp");
       setOtpCountdown(60);
       setShowResendOtp(false);
@@ -244,7 +244,7 @@ const SignupFlow = ({
 
     try {
       setLoading(true);
-      const res = await api.post("/verify-email", {
+      const res = await api.post("/auth/verify-email", {
         email,
         otp,
       });
@@ -301,7 +301,7 @@ const SignupFlow = ({
 
     try {
       setLoading(true);
-      const res = await api.post("/signup", {
+      const res = await api.post("/auth/signup", {
         email: email.toLowerCase().trim(),
         password,
         firstName,

@@ -4,9 +4,10 @@ import { Link } from "react-router-dom";
 import Logo from "../../assets/Logo.png";
 import LoginModal from "../login/LoginModal.jsx";
 import Dashboard from "../Account/Dashboard.jsx"
-import { Search, Bell, ChevronDown, User, LogOut, TrendingUp, CheckCircle, AlertTriangle, ArrowRight } from "lucide-react";
+import { Search, Bell, ChevronDown, TrendingUp, CheckCircle, AlertTriangle, ArrowRight } from "lucide-react";
 
 const Navbar = () => {
+  const [userName, setUserName] = useState("");
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("login");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -72,21 +73,75 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Check login state on mount
+  // Extract user name from userData
+  const extractUserName = (userData) => {
+    if (!userData) return "";
+    
+    const firstName = userData.first_name || userData.firstName || "";
+    const lastName = userData.last_name || userData.lastName || "";
+    const fullName = `${firstName} ${lastName}`.trim();
+    
+    return fullName;
+  };
+
+  // Check login state on mount and setup event listeners
   useEffect(() => {
-    const loggedIn = localStorage.getItem("isLoggedIn") === "true";
-    const email = localStorage.getItem("userEmail") || "";
-    setIsLoggedIn(loggedIn);
-    setUserEmail(email);
+    const checkLoginStatus = () => {
+      const loggedIn = localStorage.getItem("isLoggedIn") === "true";
+      const email = localStorage.getItem("userEmail") || "";
+      const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+      
+      setIsLoggedIn(loggedIn);
+      setUserEmail(email);
+      
+      // Extract and set name from userData
+      if (loggedIn && userData) {
+        const name = extractUserName(userData);
+        if (name) {
+          setUserName(name);
+        } else if (email) {
+          // Fallback to email username
+          const emailUsername = email.split('@')[0];
+          setUserName(emailUsername.charAt(0).toUpperCase() + emailUsername.slice(1));
+        }
+      }
+    };
+
+    // Initial check
+    checkLoginStatus();
 
     const handleLoginEvent = (e) => {
+      console.log("✅ Login event received in Navbar:", e.detail);
+      
+      // Force immediate state update
       setIsLoggedIn(true);
-      setUserEmail(e.detail.email);
+      
+      if (e.detail.email) {
+        setUserEmail(e.detail.email);
+        localStorage.setItem("userEmail", e.detail.email);
+      }
+      
+      if (e.detail.userData) {
+        localStorage.setItem("userData", JSON.stringify(e.detail.userData));
+        
+        // Extract and set name immediately
+        const name = extractUserName(e.detail.userData);
+        if (name) {
+          setUserName(name);
+        } else if (e.detail.email) {
+          const emailUsername = e.detail.email.split('@')[0];
+          setUserName(emailUsername.charAt(0).toUpperCase() + emailUsername.slice(1));
+        }
+      }
+      
+      localStorage.setItem("isLoggedIn", "true");
     };
 
     const handleLogoutEvent = () => {
+      console.log("🚪 Logout event received in Navbar");
       setIsLoggedIn(false);
       setUserEmail("");
+      setUserName("");
     };
 
     window.addEventListener("userLoggedIn", handleLoginEvent);
@@ -97,6 +152,35 @@ const Navbar = () => {
       window.removeEventListener("userLoggedOut", handleLogoutEvent);
     };
   }, []);
+
+  // Real-time sync useEffect - checks localStorage periodically
+  useEffect(() => {
+    const syncWithLocalStorage = () => {
+      // Only sync if we're logged in
+      if (isLoggedIn) {
+        const storedEmail = localStorage.getItem("userEmail") || "";
+        const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+        
+        // Sync email if changed
+        if (storedEmail && storedEmail !== userEmail) {
+          setUserEmail(storedEmail);
+        }
+        
+        // Sync name from userData
+        if (Object.keys(userData).length > 0) {
+          const name = extractUserName(userData);
+          if (name && name !== userName) {
+            setUserName(name);
+          }
+        }
+      }
+    };
+
+    // Sync every 300ms (fast enough but not too heavy)
+    const intervalId = setInterval(syncWithLocalStorage, 300);
+
+    return () => clearInterval(intervalId);
+  }, [isLoggedIn, userEmail, userName]);
 
   const openLoginModal = () => {
     setModalMode("login");
@@ -111,11 +195,20 @@ const Navbar = () => {
   const closeModal = () => setIsLoginModalOpen(false);
 
   const handleLogout = () => {
+    // Clear all auth-related localStorage items
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userData");
     localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("loginProvider");
     localStorage.removeItem("userEmail");
+    
+    // Update state
     setIsLoggedIn(false);
     setUserEmail("");
+    setUserName("");
     setIsDashboardModalOpen(false);
+    
+    // Dispatch logout event
     window.dispatchEvent(new Event("userLoggedOut"));
   };
 
@@ -132,9 +225,28 @@ const Navbar = () => {
 
   // Get user initials for avatar
   const getUserInitials = () => {
-    if (!userEmail) return "U";
-    const name = userEmail.split('@')[0];
-    return name.charAt(0).toUpperCase();
+    if (userName) {
+      return userName
+        .split(' ')
+        .map(word => word.charAt(0))
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+    }
+    if (userEmail) {
+      return userEmail.charAt(0).toUpperCase();
+    }
+    return "U";
+  };
+
+  // Get display name for navbar
+  const getDisplayName = () => {
+    if (userName) return userName;
+    if (userEmail) {
+      const emailUsername = userEmail.split('@')[0];
+      return emailUsername.charAt(0).toUpperCase() + emailUsername.slice(1);
+    }
+    return "User";
   };
 
   // Mark all notifications as read
@@ -210,14 +322,9 @@ const Navbar = () => {
                   <div className="absolute -inset-2 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full opacity-0 group-hover:opacity-20 blur-md transition-opacity duration-300"></div>
                 </div>
                 <div className="flex flex-col">
-                 <span className=" text-3xl font-bold
-    bg-gradient-to-r from-neonBlue via-aquaMintDark to-neonBlue
-    bg-clip-text text-transparent
-    transition-all duration-300
-    group-hover:tracking-wide">
-  Finvested
-</span>
-
+                  <span className="text-3xl font-bold bg-gradient-to-r from-neonBlue via-aquaMintDark to-neonBlue bg-clip-text text-transparent transition-all duration-300 group-hover:tracking-wide">
+                    Finvested
+                  </span>
                   <span className="text-sm font-bold bg-gradient-to-r from-[#5064FF] to-[#5064FF] bg-clip-text text-transparent leading-tight">
                     SMART INVESTING
                   </span>
@@ -257,23 +364,17 @@ const Navbar = () => {
               {!isLoggedIn ? (
                 <div className="flex items-center space-x-3">
                   <button
-  onClick={openLoginModal}
-  className="px-5 py-2.5 text-sm font-semibold text-[#5064FF] border-2 border-[#5064FF] rounded-xl 
-             hover:bg-[#E6E8FF] hover:border-[#3948E0] hover:text-[#3948E0] active:scale-95 
-             transition-all duration-200 shadow-sm"
->
-  Log In
-</button>
-
-<button
-  onClick={openSignupModal}
-  className="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-aquaMintDark to-neonBlue 
-             rounded-xl hover:shadow-lg hover:shadow-neonBlue/30 hover:from-neonBlue hover:to-aquaMintDark 
-             active:scale-95 transition-all duration-200 shadow-md"
->
-  Sign Up Free
-</button>
-
+                    onClick={openLoginModal}
+                    className="px-5 py-2.5 text-sm font-semibold text-[#5064FF] border-2 border-[#5064FF] rounded-xl hover:bg-[#E6E8FF] hover:border-[#3948E0] hover:text-[#3948E0] active:scale-95 transition-all duration-200 shadow-sm"
+                  >
+                    Log In
+                  </button>
+                  <button
+                    onClick={openSignupModal}
+                    className="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-aquaMintDark to-neonBlue rounded-xl hover:shadow-lg hover:shadow-neonBlue/30 hover:from-neonBlue hover:to-aquaMintDark active:scale-95 transition-all duration-200 shadow-md"
+                  >
+                    Sign Up Free
+                  </button>
                 </div>
               ) : (
                 <div className="flex items-center space-x-4">
@@ -393,14 +494,15 @@ const Navbar = () => {
                       className="flex items-center space-x-3 group p-1.5 pr-3 rounded-xl hover:bg-gray-100 transition-all duration-200"
                     >
                       <div className="relative">
-                        <div className="h-10 w-10 bg-gradient-to-br from-emerald-500 to-green-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-md group-hover:shadow-lg transition-all duration-300 group-hover:scale-105">
+                      <div className="h-10 w-10 text-white bg-gradient-to-r from-aquaMintDark to-neonBlue rounded-full hover:shadow-lg hover:shadow-neonBlue/30 hover:from-neonBlue hover:to-aquaMintDark active:scale-95 transition-all duration-200 shadow-md">
+
                           {getUserInitials()}
                         </div>
                         <div className="absolute -inset-1 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full opacity-0 group-hover:opacity-20 blur transition-opacity duration-300"></div>
                       </div>
                       <div className="hidden lg:block text-left">
                         <p className="text-sm font-semibold text-gray-800 truncate max-w-[140px]">
-                          {userEmail ? userEmail.split('@')[0] : "User"}
+                          {getDisplayName()}
                         </p>
                         <p className="text-xs text-gray-500 truncate max-w-[140px]">
                           {userEmail}
@@ -413,12 +515,11 @@ const Navbar = () => {
 
                     {/* User Dropdown Menu */}
                     {isDashboardModalOpen && (
-  <Dashboard
-    isDashboardModalOpen={isDashboardModalOpen}
-    onToggleDashboardModal={toggleDashboardModal}
-  />
-)}
-
+                      <Dashboard
+                        isDashboardModalOpen={isDashboardModalOpen}
+                        onToggleDashboardModal={toggleDashboardModal}
+                      />
+                    )}
                   </div>
                 </div>
               )}
