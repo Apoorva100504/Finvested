@@ -141,61 +141,19 @@ function LoginModal({ isOpen, onClose, mode: initialMode = "login", onLoginSucce
     }, 1500);
   };
 
-  // ✅ UPDATED: Google Login Function - uses popup
-  const handleGoogleLogin = () => {
-    setError("");
-    setGoogleLoading(true);
-    
-    // Open in a popup window
-    const width = 500;
-    const height = 600;
-    const left = window.screen.width / 2 - width / 2;
-    const top = window.screen.height / 2 - height / 2;
-    
-    const googleAuthUrl = `${api.defaults.baseURL}/auth/google`;
-    
-    const popup = window.open(
-      googleAuthUrl,
-      'Google Login',
-      `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
-    );
-    
-    if (!popup) {
-      setError("Popup blocked! Redirecting in current window...");
-      setShakeError(true);
-      setTimeout(() => setShakeError(false), 500);
-      
-      // Fallback to direct redirect
-      setTimeout(() => {
-        window.location.href = googleAuthUrl;
-      }, 1500);
-      return;
-    }
-    
-    // Check popup status
-    const checkPopup = setInterval(() => {
-      if (popup.closed) {
-        clearInterval(checkPopup);
-        setGoogleLoading(false);
-        
-        // Check if we have auth token (user might have logged in)
-        const token = localStorage.getItem('authToken');
-        if (token) {
-          const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-          setSuccessAnimation(true);
-          
-          if (login) login(userData, token);
-          if (onLoginSuccess) onLoginSuccess(userData);
-          
-          setTimeout(() => {
-            if (onClose) onClose();
-            navigate("/loginh");
-          }, 1500);
-        }
-      }
-    }, 1000);
-  };
+ // NEW: Google login without popup — redirect in same tab
+const handleGoogleLogin = () => {
+  setError("");
+  setGoogleLoading(true);
 
+  const googleAuthUrl = `${api.defaults.baseURL}/auth/google`;
+
+  // Redirect user to Google login page in SAME TAB
+  window.location.href = googleAuthUrl;
+};
+
+    
+   
   // ✅ NEW: Alternative approach - Listen for window messages
   useEffect(() => {
     const handleMessage = (event) => {

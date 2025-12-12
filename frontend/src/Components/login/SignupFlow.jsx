@@ -110,62 +110,21 @@ const SignupFlow = ({
     }
   };
 
-  // ✅ UPDATED: Google Signup Function - uses popup
-  const handleGoogleSignup = () => {
-    setError("");
-    setGoogleLoading(true);
-    
-    // Store current email in case user entered it
-    if (email) {
-      localStorage.setItem('pendingGoogleEmail', email);
-    }
-    
-    // Open in a popup window
-    const width = 500;
-    const height = 600;
-    const left = window.screen.width / 2 - width / 2;
-    const top = window.screen.height / 2 - height / 2;
-    
-    const googleAuthUrl = `${api.defaults.baseURL}/auth/google`;
-    
-    const popup = window.open(
-      googleAuthUrl,
-      'Google Signup',
-      `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
-    );
-    
-    if (!popup) {
-      setError("Popup blocked! Redirecting in current window...");
-      
-      // Fallback to direct redirect
-      setTimeout(() => {
-        window.location.href = googleAuthUrl;
-      }, 1500);
-      return;
-    }
-    
-    // Check popup status
-    const checkPopup = setInterval(() => {
-      if (popup.closed) {
-        clearInterval(checkPopup);
-        setGoogleLoading(false);
-        
-        // Check if we have auth token (user might have signed up)
-        const token = localStorage.getItem('authToken');
-        if (token) {
-          const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-          
-          // Call completion callback
-          if (onSignupComplete) {
-            onSignupComplete({
-              token,
-              user: userData
-            });
-          }
-        }
-      }
-    }, 1000);
-  };
+ // Updated: Google Signup (NO popup, same tab redirect)
+const handleGoogleSignup = () => {
+  setError("");
+  setGoogleLoading(true);
+
+  // Store current email if user typed it
+  if (email) {
+    localStorage.setItem('pendingGoogleEmail', email);
+  }
+
+  // Redirect directly to Google OAuth
+  const googleAuthUrl = `${api.defaults.baseURL}/auth/google`;
+
+  window.location.href = googleAuthUrl;
+};
 
   // ✅ NEW: Listen for window messages
   useEffect(() => {
@@ -266,23 +225,24 @@ const SignupFlow = ({
     }
   };
 
-  // Step 3: Password setup
-  const handlePasswordSubmit = (e) => {
-    e.preventDefault();
-    setError("");
+ const handlePasswordSubmit = (e) => {
+  e.preventDefault();
+  setError("");
 
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      return;
-    }
+  const strong = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{6,}$/;
+  if (!strong.test(password)) {
+    setError("Password must be ≥6 chars and include uppercase, lowercase, number and special char.");
+    return;
+  }
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
+  if (password !== confirmPassword) {
+    setError("Passwords do not match.");
+    return;
+  }
 
-    setCurrentStep("details");
-  };
+  setCurrentStep("details");
+};
+
 
   // Step 4: Complete signup
   const handleDetailsSubmit = async (e) => {

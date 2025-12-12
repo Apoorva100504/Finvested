@@ -44,9 +44,11 @@ const fastify = Fastify({
 // ✅ Secure CORS for your frontend
 await fastify.register(cors, {
   origin: [
-    'http://localhost:3001', // React frontend
+    'http://localhost:5173', // Your Vite frontend
+    'http://localhost:3001', 
     'http://localhost:3000',
-    'http://localhost:5173'
+    'http://127.0.0.1:5173', // Add this (alternative localhost)
+    'http://0.0.0.0:5173'    // Add this if needed
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
@@ -71,9 +73,7 @@ import { authenticate } from './middleware/authMiddleware.js';
 fastify.decorate('authenticate', authenticate);
 
 // Register routes (existing code)
-fastify.register(authRoutes, { prefix: '/api/v1' });
-// Register routes - ORGANIZED WITH PROPER PREFIXES
-// await fastify.register(authRoutes, { prefix: '/api/v1' });
+fastify.register(authRoutes, { prefix: '/api/v1/auth' });  //  Register routes - ORGANIZED WITH PROPER PREFIXES
 await fastify.register(userRoutes, { prefix: '/api/v1/users' }); // CHANGED: Added /users prefix
 await fastify.register(portfolioRoutes, { prefix: '/api/v1' });
 await fastify.register(walletRoutes, { prefix: '/api/v1' });
@@ -146,7 +146,85 @@ fastify.get('/docs', async (request, reply) => {
     websocket: 'ws://localhost:3000/ws/prices for real-time prices'
   };
 });
-
+// Add this route in server.js (around line 150)
+fastify.get('/list-routes', async (request, reply) => {
+  try {
+    const routes = [];
+    
+    // Get all registered routes
+    fastify.routes.forEach((route) => {
+      routes.push({
+        method: route.method,
+        url: route.url || route.path,
+        path: route.path,
+        routePath: route.routePath || route.path
+      });
+    });
+    
+    // Also check the routing table
+    const routeTable = fastify.printRoutes();
+    console.log('Route Table:', routeTable);
+    
+    return {
+      totalRoutes: routes.length,
+      routes: routes
+        .filter(route => 
+          route.url && (
+            route.url.includes('verification') || 
+            route.url.includes('auth') || 
+            route.url.includes('send') ||
+            route.url.includes('signup') ||
+            route.url.includes('login')
+          )
+        )
+        .sort((a, b) => a.url?.localeCompare(b.url))
+    };
+  } catch (error) {
+    console.error('Error listing routes:', error);
+    return { error: error.message, stack: error.stack };
+  }
+});
+// Add this route in server.js (around line 150)
+fastify.post('/debug-sendgrid', async (request, reply) => {
+  try {
+    const { email = "test@gmail.com" } = request.body;
+    
+    console.log('\n🧪 DEBUG SENDGRID TEST');
+    console.log('🔑 API Key from env:', process.env.SENDGRID_API_KEY ? 'Present' : 'MISSING!');
+    console.log('📧 Test email:', email);
+    
+    // Test SendGrid directly
+    const sgMail = (await import('@sendgrid/mail')).default;
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    
+    const msg = {
+      to: email,
+      from: 'apoorva@finestcoder.com',
+      subject: 'SendGrid Test Email',
+      text: 'This is a test email from SendGrid',
+      html: '<strong>This is a test email from SendGrid</strong>',
+    };
+    
+    console.log('🚀 Sending test email...');
+    const result = await sgMail.send(msg);
+    console.log('✅ Test email sent! Response:', result[0].statusCode);
+    
+    return { 
+      success: true, 
+      message: 'Test email sent',
+      status: result[0].statusCode,
+      email: email 
+    };
+    
+  } catch (error) {
+    console.error('❌ SendGrid test failed:', error);
+    return { 
+      success: false, 
+      error: error.message,
+      details: error.response?.body 
+    };
+  }
+});
 // EMAIL TEST ROUTE HERE ↓↓↓
 fastify.get('/test-email', async (request, reply) => {
   try {
@@ -320,7 +398,61 @@ fastify.get('/test-db', async (request, reply) => {
       error: error.message 
     };
   }
-});// Import database initialization
+});
+// Add this after registering ALL routes
+fastify.ready(() => {
+  console.log('\n📋 ===== REGISTERED ROUTES =====');
+  
+  // Method 1: Using printRoutes
+  const routesTable = fastify.printRoutes();
+  console.log(routesTable);
+  
+  // Method 2: Check specific prefixes
+  console.log('\n🔍 Looking for auth-related routes:');
+  
+  const allRoutes = fastify.routes || [];
+  allRoutes.forEach((route, i) => {
+    if (route.url && (
+      route.url.includes('auth') || 
+      route.url.includes('verification') ||
+      route.url.includes('signup') ||
+      route.url.includes('login')
+    )) {
+      console.log(`Route ${i}: ${route.method} ${route.url} (path: ${route.path})`);
+    }
+  });
+  
+  console.log('================================\n');
+});
+// Add this route in server.js
+fastify.post('/test-auth-route', async (request, reply) => {
+  console.log('✅ Test auth route working!');
+  return { 
+    success: true, 
+    message: 'Auth route test',
+    body: request.body 
+  };
+});
+
+// Also test if your auth routes file is loaded
+fastify.get('/check-auth-import', async (request, reply) => {
+  try {
+    // Try to import authRoutes to see if it exists
+    const authModule = await import('./routes/auth.js');
+    return {
+      success: true,
+      authRoutesExists: !!authModule.default,
+      module: Object.keys(authModule)
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message,
+      stack: error.stack
+    };
+  }
+});
+// Import database initialization
 import { initializeDatabase } from './config/database.js';
 
 // Initialize database tables before starting server

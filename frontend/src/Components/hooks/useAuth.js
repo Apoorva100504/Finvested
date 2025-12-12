@@ -1,5 +1,3 @@
-
-
 // hooks/useAuth.js
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +17,7 @@ export const useAuth = () => {
   useEffect(() => {
     const initializeAuth = () => {
       const token = localStorage.getItem('authToken');
-      const userStr = localStorage.getItem('user');
+      const userStr = localStorage.getItem('userData'); // Changed from 'user' to 'userData'
       const isLoggedIn = localStorage.getItem('isLoggedIn');
 
       if (token && userStr && isLoggedIn === 'true') {
@@ -33,31 +31,31 @@ export const useAuth = () => {
             error: null
           });
         } catch (error) {
-  console.error('Error parsing user data:', error);
-  // Clear localStorage without triggering logout event
-  localStorage.removeItem('authToken');
-  localStorage.removeItem('user');
-  localStorage.removeItem('isLoggedIn');
-  localStorage.removeItem('userEmail');
-  setAuth({
-    user: null,
-    token: null,
-    isAuthenticated: false,
-    loading: false,
-    error: null
-  });
-}
+          console.error('Error parsing user data:', error);
+          // Clear localStorage without triggering logout event
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('userData');
+          localStorage.removeItem('isLoggedIn');
+          localStorage.removeItem('userEmail');
+          setAuth({
+            user: null,
+            token: null,
+            isAuthenticated: false,
+            loading: false,
+            error: null
+          });
+        }
       }
     };
 
     initializeAuth();
 
-    // Listen for login/logout events
+    // Listen for login events only (removed logout event to prevent recursion)
     const handleLogin = (event) => {
       const { user, token } = event.detail || {};
       if (user && token) {
         localStorage.setItem('authToken', token);
-        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('userData', JSON.stringify(user)); // Changed from 'user' to 'userData'
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('userEmail', user.email);
 
@@ -70,22 +68,16 @@ export const useAuth = () => {
       }
     };
 
-    const handleLogout = () => {
-      logout();
-    };
-
     window.addEventListener('userLoggedIn', handleLogin);
-    window.addEventListener('userLoggedOut', handleLogout);
 
     return () => {
       window.removeEventListener('userLoggedIn', handleLogin);
-      window.removeEventListener('userLoggedOut', handleLogout);
     };
   }, []);
 
   const login = useCallback((userData, authToken) => {
     localStorage.setItem('authToken', authToken);
-    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('userData', JSON.stringify(userData)); // Changed from 'user' to 'userData'
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('userEmail', userData.email);
 
@@ -104,10 +96,10 @@ export const useAuth = () => {
 
   const logout = useCallback(() => {
     localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
+    localStorage.removeItem('userData'); // Changed from 'user' to 'userData'
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('userEmail');
-    localStorage.removeItem('fcmToken');
+    localStorage.removeItem('loginProvider');
 
     setAuth({
       user: null,
@@ -117,18 +109,19 @@ export const useAuth = () => {
       error: null
     });
 
-    window.dispatchEvent(new CustomEvent('userLoggedOut'));
+    // Dispatch logout event for Navbar (different event name to avoid recursion)
+    window.dispatchEvent(new Event('userLoggedOut'));
     navigate('/');
   }, [navigate]);
 
   const updateUserData = useCallback((updatedData) => {
-    const currentUserStr = localStorage.getItem('user');
+    const currentUserStr = localStorage.getItem('userData'); // Changed from 'user' to 'userData'
     if (currentUserStr) {
       try {
         const currentUser = JSON.parse(currentUserStr);
         const mergedUser = { ...currentUser, ...updatedData };
 
-        localStorage.setItem('user', JSON.stringify(mergedUser));
+        localStorage.setItem('userData', JSON.stringify(mergedUser)); // Changed from 'user' to 'userData'
 
         setAuth(prev => ({
           ...prev,
@@ -156,9 +149,6 @@ export const useAuth = () => {
     setAuth(prev => ({ ...prev, error: null }));
   }, []);
 
-  // Check if user is authenticated
-  const isAuthenticated = auth.isAuthenticated && auth.token;
-
   // Get user ID safely
   const userId = auth.user?.id || null;
 
@@ -167,20 +157,19 @@ export const useAuth = () => {
 
   // Get user name
   const getUserName = useCallback(() => {
-    if (auth.user?.firstName) {
-      return `${auth.user.firstName} ${auth.user.lastName || ''}`.trim();
+    if (auth.user?.firstName || auth.user?.first_name) {
+      const firstName = auth.user.firstName || auth.user.first_name || '';
+      const lastName = auth.user.lastName || auth.user.last_name || '';
+      return `${firstName} ${lastName}`.trim();
     }
-    return auth.user?.email || 'User';
+    return auth.user?.email?.split('@')[0] || 'User';
   }, [auth.user]);
-
-  // Get KYC status directly from user object (matches your backend)
-  const isKycVerified = auth.user?.isKycVerified === true;
 
   return {
     // State
     user: auth.user,
     token: auth.token,
-    isAuthenticated,
+    isAuthenticated: auth.isAuthenticated,
     loading: auth.loading,
     error: auth.error,
     userId,
@@ -195,7 +184,6 @@ export const useAuth = () => {
     clearError: clearAuthError,
 
     // Getters
-    isKycVerified,
     getUserName,
 
     // Additional helper

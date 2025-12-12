@@ -17,7 +17,7 @@ import AllOrders from "./Components/Account/AllOrders.jsx";
 import CustomerSupport from "./Components/Account/CustomerSupport.jsx";
 import Reports from "./Components/Account/Reports.jsx";
 import Logout from "./Components/Account/Logout.jsx";
-
+import AuthSuccess from "./Components/Auth/AuthSuccess.jsx";
 // Portfolio
 import PortfolioPage from "./Components/Portfolio/PortfolioPage.jsx";
 import AnalyticsPage from "./Components/Portfolio/AnalyticsPage.jsx";
@@ -77,7 +77,8 @@ function App() {
           <Routes>
             {/* Home */}
             <Route path="/" element={<Homepage />} />
-             <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/auth/success" element={<AuthSuccess />} /> {/* ✅ Fixed - removed comment */}
             
             {/* Watchlist */}
             <Route path="/watchlist" element={<Watchlist />} />
@@ -86,15 +87,15 @@ function App() {
             {/* Stocks */}
             <Route path="/stocks" element={<StockDashboard />} />
             
-            {/* Stock Details Page - ADD THIS ROUTE */}
+            {/* Stock Details Page */}
             <Route path="/stock/:symbol" element={<StockDetailsPage />} />
             <Route path="/Noorder" element={<Noorder />} />
            
-            
             {/* Wallet */}
             <Route path="/wallet" element={<WalletPage />} />
             <Route path="/Loginh" element={<LoginHome />} />
             <Route path="/holding" element={<Holding/>} />
+            
             {/* Account */}
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/orders" element={<AllOrders />} />

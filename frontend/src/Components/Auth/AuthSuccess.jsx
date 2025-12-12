@@ -1,77 +1,82 @@
 // src/Components/Auth/AuthSuccess.jsx
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import api from '../../services/api'; // Adjust path to your api.js
 
-function AuthSuccess() {
+const AuthSuccess = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const token = params.get('token');
-    const userId = params.get('userId');
-    
-    console.log('Google OAuth Success - Token:', token ? 'Yes' : 'No');
-    console.log('Google OAuth Success - UserId:', userId ? 'Yes' : 'No');
-    
-    if (token && userId) {
-      // Store token
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('loginProvider', 'google');
-      
-      // Get user data (simulate for now)
-      const userData = {
-        id: userId,
-        email: 'google-user@example.com',
-        firstName: 'Google',
-        lastName: 'User'
-      };
-      localStorage.setItem('userData', JSON.stringify(userData));
-      
-      // Trigger login event for Navbar
-      const loginEvent = new CustomEvent('userLoggedIn', { 
-        detail: { 
-          email: userData.email,
-          provider: "google"
-        } 
-      });
-      window.dispatchEvent(loginEvent);
-      
-      console.log('Google login successful, redirecting to dashboard...');
-      
-      // Redirect to dashboard after 1 second
-      setTimeout(() => {
+    const handleGoogleAuthSuccess = async () => {
+      const params = new URLSearchParams(location.search);
+      const token = params.get('token');
+      const userId = params.get('userId');
+
+      if (!token || !userId) {
+        console.error('Missing token or userId in URL');
+        navigate('/login');
+        return;
+      }
+
+      try {
+        // Store the token
+        localStorage.setItem('authToken', token);
+        localStorage.setItem('userId', userId);
+        localStorage.setItem('isLoggedIn', 'true');
+
+        // Set the token for API requests
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+        // Fetch user data
+        const response = await api.get('/auth/user');
+        const userData = response.data;
+
+        // Store user data
+        localStorage.setItem('userData', JSON.stringify(userData));
+        localStorage.setItem('userEmail', userData.email);
+
+        // Dispatch login event for Navbar
+        const loginEvent = new CustomEvent('userLoggedIn', {
+          detail: { 
+            user: userData, 
+            token: token,
+            email: userData.email
+          }
+        });
+        window.dispatchEvent(loginEvent);
+
+        // Redirect to dashboard or home
         navigate('/dashboard');
-      }, 1000);
-    } else {
-      console.log('No token found, redirecting to login...');
-      navigate('/login');
-    }
+
+      } catch (error) {
+        console.error('Error in Google auth success:', error);
+        
+        // Clear invalid data
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('isLoggedIn');
+        
+        navigate('/login');
+      }
+    };
+
+    handleGoogleAuthSuccess();
   }, [location, navigate]);
-  
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-      <div className="text-center p-8 bg-white rounded-2xl shadow-xl max-w-md w-full mx-4">
-        {/* Success Icon */}
-        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-          <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-          </svg>
-        </div>
-        
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Login Successful!</h2>
-        <p className="text-gray-600 mb-6">Welcome to Finvested</p>
-        
-        {/* Loading animation */}
-        <div className="w-48 h-2 bg-gray-200 rounded-full overflow-hidden mx-auto">
-          <div className="h-full bg-gradient-to-r from-green-400 to-blue-500 animate-progress w-full"></div>
-        </div>
-        
-        <p className="text-sm text-gray-500 mt-4">Redirecting to your dashboard...</p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+        <h2 className="text-xl font-semibold text-gray-800 mb-2">
+          Completing Google Sign In...
+        </h2>
+        <p className="text-gray-600">
+          Please wait while we authenticate your account.
+        </p>
       </div>
     </div>
   );
-}
+};
 
 export default AuthSuccess;

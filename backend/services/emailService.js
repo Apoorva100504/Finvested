@@ -1,11 +1,19 @@
 // services/emailService.js
 import sgMail from '@sendgrid/mail';
 
-// Initialize SendGrid
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+console.log('\n🔧 ===== EMAIL SERVICE INITIALIZATION =====');
+console.log('📧 Loading SendGrid...');
+console.log('🔑 SENDGRID_API_KEY from .env:', !!process.env.SENDGRID_API_KEY);
+
+if (!process.env.SENDGRID_API_KEY) {
+  console.error('❌ CRITICAL: SENDGRID_API_KEY is not set in environment variables!');
+  console.error('   Check your .env file for SENDGRID_API_KEY');
+} else {
+  console.log('✅ SendGrid API Key loaded');
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
 
 export class EmailService {
-  
   // Send order confirmation email
   static async sendOrderConfirmation(userEmail, orderDetails) {
     const msg = {
@@ -112,6 +120,19 @@ export class EmailService {
     }
   }
   static async sendOTPEmail(userEmail, otpCode) {
+  console.log('📤 ======== SENDING OTP EMAIL ========');
+  console.log('📧 To:', userEmail);
+  console.log('🔑 SendGrid API Key present:', !!process.env.SENDGRID_API_KEY);
+  console.log('🔑 API Key (first 15 chars):', process.env.SENDGRID_API_KEY?.substring(0, 15) + '...');
+  console.log('✉️ From email:', 'apoorva@finestcoder.com');
+  console.log('🔢 OTP Code:', otpCode);
+  
+  // Validate email
+  if (!userEmail || !userEmail.includes('@')) {
+    console.error('❌ Invalid email address:', userEmail);
+    return false;
+  }
+  
   const msg = {
     to: userEmail,
     from: 'apoorva@finestcoder.com',
@@ -133,11 +154,31 @@ export class EmailService {
   };
 
   try {
-    await sgMail.send(msg);
-    console.log(`✅ OTP email sent to ${userEmail}`);
+    console.log('🚀 Attempting to send via SendGrid...');
+    const response = await sgMail.send(msg);
+    console.log('✅ EMAIL SENT SUCCESSFULLY!');
+    console.log('📊 Status Code:', response[0].statusCode);
     return true;
   } catch (error) {
-    console.error('❌ OTP email error:', error);
+    console.error('❌ SENDGRID ERROR DETAILS:');
+    console.error('Error Code:', error.code);
+    console.error('Error Message:', error.message);
+    console.error('Full Error:', error);
+    
+    if (error.response) {
+      console.error('Response Status:', error.response.statusCode);
+      console.error('Response Body:', JSON.stringify(error.response.body, null, 2));
+      console.error('Response Headers:', error.response.headers);
+    }
+    
+    // Check for common SendGrid errors
+    if (error.message.includes('Unauthorized')) {
+      console.error('🔑 SENDGRID API KEY ISSUE: Invalid or missing API key');
+    }
+    if (error.message.includes('sender authentication')) {
+      console.error('✉️ SENDER ISSUE: apoorva@finestcoder.com is not verified in SendGrid');
+    }
+    
     return false;
   }
 }

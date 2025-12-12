@@ -494,7 +494,8 @@ const Navbar = () => {
                       className="flex items-center space-x-3 group p-1.5 pr-3 rounded-xl hover:bg-gray-100 transition-all duration-200"
                     >
                       <div className="relative">
-                      <div className="h-10 w-10 text-white bg-gradient-to-r from-aquaMintDark to-neonBlue rounded-full hover:shadow-lg hover:shadow-neonBlue/30 hover:from-neonBlue hover:to-aquaMintDark active:scale-95 transition-all duration-200 shadow-md">
+                     <div className="h-10 w-10 flex items-center justify-center text-white bg-gradient-to-r from-aquaMintDark to-neonBlue rounded-full hover:shadow-lg hover:shadow-neonBlue/30 hover:from-neonBlue hover:to-aquaMintDark active:scale-95 transition-all duration-200 shadow-md">
+
 
                           {getUserInitials()}
                         </div>
