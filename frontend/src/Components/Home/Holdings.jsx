@@ -534,11 +534,7 @@ export default function HoldingsUI() {
                   </div>
                 </div>
 
-                {/* Price / Value headings */}
-                <div className="flex items-center gap-12">
-                  <p className="text-sm font-medium text-gray-600">Price</p>
-                  <p className="text-sm font-medium text-gray-600">Value</p>
-                </div>
+                
               </div>
 
               {/* Holdings List Items */}
@@ -616,26 +612,7 @@ export default function HoldingsUI() {
                             </motion.p>
                           </div>
 
-                          {/* Value Column */}
-                          <div className="text-right w-28">
-                            <p className="font-bold text-gray-900">
-                              {formatCurrency(currentValue)}
-                            </p>
-                            <motion.p 
-                              initial={false}
-                              animate={{ 
-                                scale: returns !== 0 ? [1, 1.05, 1] : 1 
-                              }}
-                              transition={{ 
-                                duration: 0.5,
-                                repeat: returns !== 0 ? Infinity : 0,
-                                repeatDelay: 3 
-                              }}
-                              className={`text-sm font-medium ${returns >= 0 ? 'text-green-600' : 'text-red-500'}`}
-                            >
-                              {returns >= 0 ? '+' : ''}{formatCurrency(returns)}
-                            </motion.p>
-                          </div>
+                         
                         </div>
 
                         {/* Selection Indicator */}

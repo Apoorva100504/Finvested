@@ -307,7 +307,7 @@ const handleGoogleSignup = () => {
           <>
             <h3
               className="modal-title-right mb-1 text-center 
-                         bg-gradient-to-r from-aquaMint to-neonBlue 
+                         bg-gray-600 
                          bg-clip-text text-transparent"
             >
               Create Account

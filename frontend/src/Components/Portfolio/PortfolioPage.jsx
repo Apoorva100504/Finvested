@@ -404,7 +404,7 @@ export default function PortfolioUI() {
                 positive: true,
                 icon: "💰",
                 description: "Current portfolio value",
-                intensity: "medium"
+                intensity: "low"
               },
               {
                 label: "Total Returns",
@@ -412,7 +412,7 @@ export default function PortfolioUI() {
                 positive: summary.totalReturns >= 0,
                 icon: summary.totalReturns >= 0 ? "📈" : "📉",
                 description: "Total profit/loss",
-                intensity: "medium"
+                intensity: "low"
               },
               {
                 label: "Return %",
@@ -420,7 +420,7 @@ export default function PortfolioUI() {
                 positive: summary.overallReturnPercentage >= 0,
                 icon: summary.overallReturnPercentage >= 0 ? "🔥" : "⚠️",
                 description: "Overall return percentage",
-                intensity: "medium"
+                intensity: "low"
               },
               {
                 label: "Total Stocks",
@@ -428,7 +428,7 @@ export default function PortfolioUI() {
                 positive: true,
                 icon: "📦",
                 description: "Number of holdings",
-                intensity: "medium"
+                intensity: "low"
               }
             ].map((item, i) => (
               <Card3DWrapper key={i} intensity={3}>

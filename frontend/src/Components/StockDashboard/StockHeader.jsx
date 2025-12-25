@@ -87,11 +87,6 @@ const StockHeader = ({ companyName, priceInfo, historicalData, onBack }) => {
     return `${sign}${numValue.toFixed(2)}%`;
   };
 
-  
-
-
-  
-
   const handleBuySell = (type) => {
     setTradeType(type);
     setShowBuySell(true);

@@ -317,7 +317,7 @@ const Navbar = () => {
                   <img
                     src={Logo}
                     alt="Finvested Logo"
-                    className="h-9 w-auto transition-transform duration-300 group-hover:scale-110"
+                    className="h-14 w-auto transition-transform duration-300 group-hover:scale-110"
                   />
                   <div className="absolute -inset-2 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full opacity-0 group-hover:opacity-20 blur-md transition-opacity duration-300"></div>
                 </div>
@@ -346,11 +346,7 @@ const Navbar = () => {
                   placeholder="Search for stocks, ETFs, mutual funds..."
                   className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent focus:bg-white transition-all duration-200 placeholder-gray-400 text-sm"
                 />
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                  <kbd className="inline-flex items-center px-2 py-1 text-xs font-medium text-gray-500 bg-gray-100 border border-gray-300 rounded-lg">
-                    ⌘K
-                  </kbd>
-                </div>
+                
               </div>
             </div>
 
